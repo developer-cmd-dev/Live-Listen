@@ -1,10 +1,10 @@
-import express, { Router } from 'express';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors';
 import helmet from 'helmet';
 import route from './routes/router.js';
 import ErrorMiddleware from './middleware/error.middleware.js';
 import bodyParser from 'body-parser';
+import express from 'express';
 const app = express();
 const port = 3000;
 const client = new PrismaClient();
@@ -15,9 +15,7 @@ app.use(bodyParser.urlencoded({
 }));
 client.$connect().then(() => {
     console.log("Db is connected");
-    app.listen(port, (error) => {
-        if (error)
-            console.log(error.message);
+    app.listen(port, () => {
         console.log("Server is running on " + port);
     });
 }).catch(error => console.log(error.message));

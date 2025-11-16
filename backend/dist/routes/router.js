@@ -1,9 +1,8 @@
 import { Router } from "express";
 import {} from "express";
 import { CustomError } from "../error/ErrorHandler.js";
+import { createUser } from "../controller/user.controller.js";
 const route = Router();
-route.get("/", (req, res) => {
-    throw new CustomError("This is error", 505);
-});
+route.get("/", createUser);
 export default route;
 //# sourceMappingURL=router.js.map

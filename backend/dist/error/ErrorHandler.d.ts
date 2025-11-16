@@ -1,5 +1,5 @@
 export declare class CustomError extends Error {
-    statusCode: number;
+    statuscode: number;
     constructor(message: String, statuscode: number);
 }
 //# sourceMappingURL=ErrorHandler.d.ts.map

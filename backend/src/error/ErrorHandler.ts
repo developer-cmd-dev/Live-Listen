@@ -1,10 +1,10 @@
  export class CustomError extends Error{
 
-    statusCode:number=0;
+    statuscode:number;
     constructor(message:String,statuscode:number){
         //@ts-ignore
         super(message)
-        this.statusCode = statuscode;
+        this.statuscode = statuscode;
     }
 
 
