@@ -1,8 +1,11 @@
-import express,{Router, type Request,type Response} from 'express';
+import express,{Router, type Request,type Response, type NextFunction} from 'express';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors'
 import helmet from 'helmet';
 import route from './routes/router.js';
+import ErrorMiddleware from './middleware/error.middleware.js';
+import bodyParser from 'body-parser';
+
 
 const app = express();
 const port:number = 3000;
@@ -10,6 +13,9 @@ const client = new PrismaClient();
 
 app.use(cors())
 app.use(helmet())
+app.use(bodyParser.urlencoded({
+    extended:true
+}))
 
 
 client.$connect().then(()=>{
@@ -20,6 +26,5 @@ client.$connect().then(()=>{
 })
 }).catch(error=>console.log(error.message));
 
-
-
 app.use(route)
+app.use(ErrorMiddleware);

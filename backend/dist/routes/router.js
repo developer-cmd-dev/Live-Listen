@@ -1,10 +1,9 @@
 import { Router } from "express";
 import {} from "express";
+import { CustomError } from "../error/ErrorHandler.js";
 const route = Router();
 route.get("/", (req, res) => {
-    res.json({
-        message: "Health is ok"
-    });
+    throw new CustomError("This is error", 505);
 });
 export default route;
 //# sourceMappingURL=router.js.map
