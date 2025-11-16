@@ -11,6 +11,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@prisma/client": "^6.19.0",
     "@types/express": "^5.0.5",
     "@types/pg": "^8.15.6",
     "dotenv": "^17.2.3",

@@ -6,9 +6,4 @@ app.listen(port, (error) => {
         console.log(error.message);
     console.log("Server is running on " + port);
 });
-app.get("/", async (req, res) => {
-    res.status(200).json({
-        message: "Health is ok"
-    });
-});
 //# sourceMappingURL=index.js.map
