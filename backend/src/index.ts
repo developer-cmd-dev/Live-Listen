@@ -1,4 +1,3 @@
-import express,{Router, type Request,type Response, type NextFunction} from 'express';
 import { PrismaClient } from '@prisma/client';
 import cors from 'cors'
 import helmet from 'helmet';
