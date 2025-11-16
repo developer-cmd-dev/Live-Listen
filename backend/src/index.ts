@@ -13,9 +13,7 @@ const client = new PrismaClient();
 
 app.use(cors())
 app.use(helmet())
-app.use(bodyParser.urlencoded({
-    extended:true
-}))
+app.use(express.json())
 
 
 client.$connect().then(()=>{

@@ -8,7 +8,7 @@ import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 
-const createUser = async(req:Request,res:Response,next:NextFunction)=>{
+const createUser = async(req:Request,res:Response)=>{
     const userSchema = z.object({
         email:z.email("Incorrect Email"),
         name:z.string("Incorrect Name formate"),

@@ -3,13 +3,14 @@ import { CustomError } from '../error/ErrorHandler.js';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
-const createUser = async (req, res, next) => {
+const createUser = async (req, res) => {
     const userSchema = z.object({
         email: z.email("Incorrect Email"),
         name: z.string("Incorrect Name formate"),
         password: z.string("Icorrect Password formate"),
     });
     const userData = req.body;
+    console.log(req.body);
     const result = userSchema.safeParse(userData);
     if (result.error) {
         throw new CustomError(result.error.message, 404);
