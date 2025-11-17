@@ -1,8 +1,10 @@
 import { Router } from "express";
 import {} from "express";
 import { CustomError } from "../error/ErrorHandler.js";
-import { createUser } from "../controller/user.controller.js";
+import { createUser, login } from "../controller/user.controller.js";
+import authMiddleware from "../middleware/auth.middleware.js";
 const route = Router();
-route.get("/", createUser);
+route.post("/signup", createUser);
+route.get("/login", authMiddleware, login);
 export default route;
 //# sourceMappingURL=router.js.map

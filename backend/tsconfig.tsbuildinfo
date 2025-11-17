@@ -1,1 +1,1 @@
-{"root":["./src/index.ts","./src/prisma.config.ts","./src/controller/user.controller.ts","./src/error/ErrorHandler.ts","./src/middleware/error.middleware.ts","./src/routes/router.ts"],"version":"5.9.3"}
+{"root":["./src/index.ts","./src/prisma.config.ts","./src/controller/user.controller.ts","./src/error/ErrorHandler.ts","./src/middleware/auth.middleware.ts","./src/middleware/error.middleware.ts","./src/routes/router.ts","./src/utility/Jwt.ts"],"version":"5.9.3"}

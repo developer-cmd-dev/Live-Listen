@@ -3,6 +3,7 @@ import * as z from 'zod'
 import { CustomError } from '../error/ErrorHandler.js';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import Jwt from '../utility/Jwt.js';
 
 
 const prisma = new PrismaClient();
@@ -40,4 +41,15 @@ const createUser = async(req:Request,res:Response)=>{
 }
 
 
-export {createUser}
+const login = async(req:Request,res:Response)=>{
+  const userData = res.locals;
+  try {
+    const accessToken = Jwt.sign(userData.email,60);
+    res.status(200).json(accessToken);
+  } catch (error) {
+    
+  }
+}
+
+
+export {createUser,login}
