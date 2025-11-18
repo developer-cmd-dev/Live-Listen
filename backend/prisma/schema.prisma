@@ -33,7 +33,7 @@ image       String
 zip         String
 shorturl    String
 shareurl    String
-zip_allowed String
+zip_allowed Boolean
 createdAt   DateTime @default(now())
 updatedAt   DateTime @updatedAt
 }

@@ -9,9 +9,11 @@ const dashboard = async (req, res) => {
     // Album
     try {
         const albumDataResponse = await axios.get(`https://api.jamendo.com/v3.0/albums/?client_id=${process.env.JAMENDO_CLIENT_ID}&limit=20&format=jsonpretty&type=album+single`);
+        const albumDataArr = albumDataResponse.data.results;
+        const cleanedData = albumDataArr.map(({ id, ...rest }) => rest);
         const response = await prisma.album.createMany({
             data: [
-                ...albumDataResponse.data.results
+                ...cleanedData
             ],
             skipDuplicates: true
         });
