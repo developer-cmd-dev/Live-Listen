@@ -42,13 +42,7 @@ const createUser = async(req:Request,res:Response)=>{
 
 
 const login = async(req:Request,res:Response)=>{
-  const userData = res.locals;
-  try {
-    const accessToken = Jwt.sign(userData.email,60);
-    res.status(200).json(accessToken);
-  } catch (error) {
-    
-  }
+  res.status(200).json("User Logged in successfully");
 }
 
 

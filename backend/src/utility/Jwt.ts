@@ -1,4 +1,6 @@
-import  jwt from 'jsonwebtoken'
+import pkg from 'jsonwebtoken'
+
+const  { JsonWebTokenError, TokenExpiredError,verify,sign } =pkg
 import { CustomError } from '../error/ErrorHandler.js';
 import {config} from 'dotenv'
 config();
@@ -12,16 +14,24 @@ class Jwt{
     }
 
     sign(data:string,expirey:number) {
-      return jwt.sign({
+      return sign({
             data:data
         },this.secret,{expiresIn:expirey*expirey})
     }
 
     verify(token:string){
         try{
-           return jwt.verify(token,this.secret);
+           return verify(token,this.secret);
         }catch(error){
-            throw new CustomError("Token expired",404);
+            if(error instanceof TokenExpiredError){
+                throw new CustomError("Token expired",404);
+            }else if(error instanceof JsonWebTokenError){
+                throw new CustomError("Invalid Token",404);
+            }else{
+                throw new CustomError("Something went wrong",404);
+            }
+
+           
         }
     }
 

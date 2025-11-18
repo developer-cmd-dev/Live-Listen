@@ -1,27 +1,38 @@
 import { PrismaClient } from "@prisma/client";
-import { email } from "zod";
+import { email, jwt } from "zod";
 import bcrypt from 'bcrypt';
 import { CustomError } from "../error/ErrorHandler.js";
+import Jwt from "../utility/Jwt.js";
 const prisma = new PrismaClient();
 const authMiddleware = async (req, res, next) => {
-    const userData = req.body;
-    const getUser = await prisma.user.findFirst({
-        where: {
-            email: userData.email
-        }
-    });
-    if (getUser) {
-        const comparedPassw = await bcrypt.compare(userData.password, getUser.password);
-        if (comparedPassw) {
-            res.locals = getUser;
+    if (req.headers.authorization) {
+        const extractToken = req.headers.authorization.replace("Bearer ", "");
+        const verifyToken = Jwt.verify(extractToken);
+        if (verifyToken)
             next();
-        }
-        else {
-            throw new CustomError("Password not matched", 401);
-        }
     }
     else {
-        throw new CustomError("User not found", 404);
+        const userData = req.body;
+        const getUser = await prisma.user.findFirst({
+            where: {
+                email: userData.email
+            }
+        });
+        if (getUser) {
+            const comparedPassw = await bcrypt.compare(userData.password, getUser.password);
+            if (comparedPassw) {
+                const accessToken = Jwt.sign(getUser.email, 60);
+                res.cookie("Access-Token", accessToken);
+                res.locals = getUser;
+                next();
+            }
+            else {
+                throw new CustomError("Password not matched", 401);
+            }
+        }
+        else {
+            throw new CustomError("User not found", 404);
+        }
     }
 };
 export default authMiddleware;

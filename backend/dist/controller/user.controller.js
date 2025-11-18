@@ -32,13 +32,7 @@ const createUser = async (req, res) => {
     }
 };
 const login = async (req, res) => {
-    const userData = res.locals;
-    try {
-        const accessToken = Jwt.sign(userData.email, 60);
-        res.status(200).json(accessToken);
-    }
-    catch (error) {
-    }
+    res.status(200).json("User Logged in successfully");
 };
 export { createUser, login };
 //# sourceMappingURL=user.controller.js.map

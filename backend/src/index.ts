@@ -5,15 +5,17 @@ import route from './routes/router.js';
 import ErrorMiddleware from './middleware/error.middleware.js';
 import bodyParser from 'body-parser';
 import express from 'express';
+import cookieParser from 'cookie-parser'
 
 
 const app = express();
 const port:number = 3000;
 const client = new PrismaClient();
 
-app.use(cors())
-app.use(helmet())
-app.use(express.json())
+app.use(cors());
+app.use(helmet());
+app.use(express.json());
+app.use(cookieParser());
 
 
 client.$connect().then(()=>{
