@@ -22,3 +22,18 @@ model User{
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+model Album{
+id          Int     @id @default(autoincrement())
+name        String  
+releasedate String  
+artist_id    String
+artist_name  String
+image       String
+zip         String
+shorturl    String
+shareurl    String
+zip_allowed String
+createdAt   DateTime @default(now())
+updatedAt   DateTime @updatedAt
+}
