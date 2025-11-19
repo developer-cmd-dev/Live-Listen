@@ -4,6 +4,7 @@ import { config } from "dotenv"
 import { CustomError } from "../error/ErrorHandler.js";
 import { PrismaClient } from "@prisma/client";
 import { skip } from "@prisma/client/runtime/library";
+import { number, string } from "zod";
 
 config();
 const prisma = new PrismaClient();
@@ -41,48 +42,37 @@ type PlaylistData = {
     updatedAt: string,
 }
 
+type SongsData={
+id:string,
+name:string,
+duration:number,
+artist_id:string,
+artist_name:string,
+artist_idstr:string
+album_name:string,
+album_id:string,
+license_ccurl:string,
+position:number
+releasedate:string,
+album_image:string,
+audio:string,
+audiodownload:string,
+prourl:string,
+shorturl:string,
+shareurl:string,
+waveform:string,
+image:string,
+musicinfo:Object
+audiodownload_allowed:boolean,
+content_id_free:boolean,
+}
+
 
 const dashboard = async (req: Request, res: Response) => {
 
-    // Album
     try {
 
-        // const albumDataResponse = await axios.get(`https://api.jamendo.com/v3.0/albums/?client_id=${process.env.JAMENDO_CLIENT_ID}&limit=20&format=jsonpretty&type=album+single`)
-        // const albumDataArr:AlbumData[]=albumDataResponse.data.results;
-        // const cleanedData = albumDataArr.map(({id,...rest})=>rest);
-
-
-
-        // const response =await prisma.album.createMany({
-        //     data:[
-        //         ...cleanedData
-        //     ],
-        //     skipDuplicates:true
-        // })
-
-
-
-        //Playlist
-
-        const playlistDataResponse = await axios.get(`https://api.jamendo.com/v3.0/playlists/?client_id=${process.env.JAMENDO_CLIENT_ID}&format=jsonpretty&datebetween=2012-01-01_2012-02-01`);
-
-
-        const playlistData:PlaylistData[]= playlistDataResponse.data.results;
-
-        const cleanedData = playlistData.map(({ id, ...rest }) => rest)
-
-
-        const response = prisma.playlist.createManyAndReturn({
-            data:[
-                ...cleanedData
-            ],
-            skipDuplicates:true
-        })
-
-
-
-
-        res.status(200).json(response)
+      
 
     } catch (error) {
         console.log(error)

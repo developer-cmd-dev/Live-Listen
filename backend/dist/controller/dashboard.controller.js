@@ -4,6 +4,7 @@ import { config } from "dotenv";
 import { CustomError } from "../error/ErrorHandler.js";
 import { PrismaClient } from "@prisma/client";
 import { skip } from "@prisma/client/runtime/library";
+import { number, string } from "zod";
 config();
 const prisma = new PrismaClient();
 const dashboard = async (req, res) => {
@@ -22,7 +23,7 @@ const dashboard = async (req, res) => {
         const playlistDataResponse = await axios.get(`https://api.jamendo.com/v3.0/playlists/?client_id=${process.env.JAMENDO_CLIENT_ID}&format=jsonpretty&datebetween=2012-01-01_2012-02-01`);
         const playlistData = playlistDataResponse.data.results;
         const cleanedData = playlistData.map(({ id, ...rest }) => rest);
-        const response = prisma.playlist.createManyAndReturn({
+        const response = prisma.playlist.createMany({
             data: [
                 ...cleanedData
             ],
