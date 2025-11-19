@@ -10,61 +10,10 @@ config();
 const prisma = new PrismaClient();
 
 
-type DashboardData = {
-    album: string,
-    radio: string,
-    tracks: string
-}
 
-type AlbumData = {
-    id: string,
-    name: string,
-    releasedate: string,
-    artist_id: string,
-    artist_name: string
-    image: string,
-    zip: string,
-    shorturl: string,
-    shareurl: string,
-    zip_allowed: boolean,
-}
-
-type PlaylistData = {
-    id: string,
-    name: string,
-    creationdate: string,
-    user_id: string,
-    user_name: string,
-    zip: string,
-    shorturl: string,
-    shareurl: string,
-    createdAt: string,
-    updatedAt: string,
-}
-
-type SongsData={
-id:string,
-name:string,
-duration:number,
-artist_id:string,
-artist_name:string,
-artist_idstr:string
-album_name:string,
-album_id:string,
-license_ccurl:string,
-position:number
-releasedate:string,
-album_image:string,
-audio:string,
-audiodownload:string,
-prourl:string,
-shorturl:string,
-shareurl:string,
-waveform:string,
-image:string,
-musicinfo:Object
-audiodownload_allowed:boolean,
-content_id_free:boolean,
+type DashboardData={
+    album:Object,
+    songs:Object,
 }
 
 
@@ -72,11 +21,17 @@ const dashboard = async (req: Request, res: Response) => {
 
     try {
 
-      
+        const albumData = await prisma.album.findMany({take:10});
+        const songsData = await prisma.songs.findMany({take:50});
 
+        const response:DashboardData={
+            album:albumData,
+            songs:songsData
+        }
+        res.status(200).json(response)
     } catch (error) {
         console.log(error)
-        throw new CustomError("Something went wrong with Jamendo", 500);
+        throw new CustomError("Internal Server Error", 500);
     }
 
 

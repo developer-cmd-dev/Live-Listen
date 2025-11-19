@@ -8,27 +8,13 @@ import { number, string } from "zod";
 config();
 const prisma = new PrismaClient();
 const dashboard = async (req, res) => {
-    // Album
     try {
-        // const albumDataResponse = await axios.get(`https://api.jamendo.com/v3.0/albums/?client_id=${process.env.JAMENDO_CLIENT_ID}&limit=20&format=jsonpretty&type=album+single`)
-        // const albumDataArr:AlbumData[]=albumDataResponse.data.results;
-        // const cleanedData = albumDataArr.map(({id,...rest})=>rest);
-        // const response =await prisma.album.createMany({
-        //     data:[
-        //         ...cleanedData
-        //     ],
-        //     skipDuplicates:true
-        // })
-        //Playlist
-        const playlistDataResponse = await axios.get(`https://api.jamendo.com/v3.0/playlists/?client_id=${process.env.JAMENDO_CLIENT_ID}&format=jsonpretty&datebetween=2012-01-01_2012-02-01`);
-        const playlistData = playlistDataResponse.data.results;
-        const cleanedData = playlistData.map(({ id, ...rest }) => rest);
-        const response = prisma.playlist.createMany({
-            data: [
-                ...cleanedData
-            ],
-            skipDuplicates: true
-        });
+        const albumData = await prisma.album.findMany({ take: 10 });
+        const songsData = await prisma.songs.findMany({ take: 50 });
+        const response = {
+            album: albumData,
+            songs: songsData
+        };
         res.status(200).json(response);
     }
     catch (error) {
