@@ -1,15 +1,28 @@
 import { prisma } from "../utility/PrismaClient.js";
+import { CustomError } from "../error/ErrorHandler.js";
 const searchController = async (req, res) => {
     const query = req.params.name;
-    if (query) {
-        const searchResult = await prisma.songs.findMany({
-            where: {
-                name: query
-            }
-        });
-        console.log(searchResult);
+    try {
+        if (!query)
+            throw new CustomError("Empty Query", 404);
+        // const searchResult =await prisma.songs.findMany({
+        //     where:{
+        //        OR:[ {name:{
+        //             search:`plainto_tsquery('english', '${query}')`
+        //         }}]
+        //     }
+        // })
+        const searchResult = await prisma.$queryRawUnsafe(`
+          SELECT * FROM 
+              "Songs"
+              WHERE to_tsvector('english',name) @@ websearch_to_tsquery('english',$1)
+          `, query);
+        res.status(200).json(searchResult);
     }
-    res.status(200).json(query);
+    catch (error) {
+        console.log(error);
+        throw new CustomError("Internal Server Error", 505);
+    }
 };
 export { searchController };
 //# sourceMappingURL=search.controller.js.map
