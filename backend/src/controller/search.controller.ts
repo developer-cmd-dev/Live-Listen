@@ -23,13 +23,6 @@ const searchController = async(req:Request,res:Response)=>{
               "Songs"
               WHERE to_tsvector('english',name) @@ websearch_to_tsquery('english',$1)
           `,query);
-
-  
-
-
-
-
-
         res.status(200).json(searchResult)
  
     
