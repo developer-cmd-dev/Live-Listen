@@ -19,7 +19,7 @@ const dashboard = async (req, res) => {
     }
     catch (error) {
         console.log(error);
-        throw new CustomError("Something went wrong with Jamendo", 500);
+        throw new CustomError("Internal Server Error", 500);
     }
 };
 export { dashboard };
