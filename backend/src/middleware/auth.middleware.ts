@@ -17,7 +17,8 @@ const fetchUser = async(email:string)=>{
  return await prisma.user.findFirst({
             where: {
                 email: email
-            }
+            },
+
         });
 }
 
@@ -29,15 +30,14 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
         const extractToken = req.headers.authorization.replace("Bearer ", "")
         const verifyToken = Jwt.verifyToken(extractToken);
         //@ts-ignore
-        console.log(verifyToken.data)
+        const userData = await fetchUser(verifyToken.data);
+        console.log(userData)
+        if(userData)res.locals=userData;
+
         if (verifyToken) next();
     } else {
         const userData: UserData = req.body;
-        const getUser = await prisma.user.findFirst({
-            where: {
-                email: userData.email
-            }
-        });
+        const getUser =await fetchUser(userData.email);
 
         if (getUser) {
             const comparedPassw = await bcrypt.compare(userData.password, getUser.password);

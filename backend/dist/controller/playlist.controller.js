@@ -1,14 +1,16 @@
 import { prisma } from "../utility/PrismaClient.js";
 import { CustomError } from "../error/ErrorHandler.js";
 const createPlaylist = async (req, res) => {
-    const { name, isPrivate } = req.body;
+    const { playlist_name, isPrivate } = req.body;
     const userData = res.locals;
     try {
         const playlistResponse = await prisma.playlist.create({
             data: {
-                playlist_name: name,
+                playlist_name: playlist_name,
                 private: isPrivate,
-                user: userData
+                user: {
+                    connect: { id: userData.id }
+                }
             }
         });
         res.status(200).json(playlistResponse);

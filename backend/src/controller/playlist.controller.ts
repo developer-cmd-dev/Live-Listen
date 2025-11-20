@@ -4,21 +4,23 @@ import { CustomError } from "../error/ErrorHandler.js";
 
 
 type Playlist={
-    name:string,
+    playlist_name:string,
     isPrivate:boolean
 }
 
 const createPlaylist = async(req:Request,res:Response)=>{
 
-    const {name,isPrivate}:Playlist=req.body
+    const {playlist_name,isPrivate}:Playlist=req.body
     const userData = res.locals;
 
     try {
         const playlistResponse = await prisma.playlist.create({
             data:{
-                playlist_name:name,
+                playlist_name:playlist_name,
                 private:isPrivate,
-                user:userData
+                user:{
+                    connect:{id:userData.id}
+                }
             }
         })
         res.status(200).json(playlistResponse)
