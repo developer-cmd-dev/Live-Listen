@@ -8,12 +8,12 @@ class Jwt {
     constructor(secret) {
         this.secret = secret;
     }
-    sign(data, expirey) {
+    signToken(data, expirey) {
         return sign({
             data: data
         }, this.secret, { expiresIn: expirey * expirey });
     }
-    verify(token) {
+    verifyToken(token) {
         try {
             return verify(token, this.secret);
         }
@@ -22,7 +22,7 @@ class Jwt {
                 throw new CustomError("Token expired", 404);
             }
             else if (error instanceof JsonWebTokenError) {
-                throw new CustomError("Invalid Token", 404);
+                throw new CustomError(error.message, 404);
             }
             else {
                 throw new CustomError("Something went wrong", 404);

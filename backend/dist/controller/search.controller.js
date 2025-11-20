@@ -5,13 +5,6 @@ const searchController = async (req, res) => {
     try {
         if (!query)
             throw new CustomError("Empty Query", 404);
-        // const searchResult =await prisma.songs.findMany({
-        //     where:{
-        //        OR:[ {name:{
-        //             search:`plainto_tsquery('english', '${query}')`
-        //         }}]
-        //     }
-        // })
         const searchResult = await prisma.$queryRawUnsafe(`
           SELECT * FROM 
               "Songs"
@@ -20,8 +13,8 @@ const searchController = async (req, res) => {
         res.status(200).json(searchResult);
     }
     catch (error) {
-        console.log(error);
-        throw new CustomError("Internal Server Error", 505);
+        if (error instanceof Error)
+            throw new CustomError(error.message, 505);
     }
 };
 export { searchController };

@@ -21,6 +21,7 @@ model User{
   email     String   @unique
   password  String   
   name      String?
+  playlist  Playlist[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -44,13 +45,11 @@ updatedAt   DateTime @updatedAt
 model Playlist{
 
 id              Int     @id @default(autoincrement())
-name            String
-creationdate    String
-user_id         String
-user_name       String
-zip             String
-shorturl        String
-shareurl        String
+playlist_name   String
+private         Boolean
+userId          Int
+user            User @relation(fields: [userId],references: [id])
+songs           Songs[] @relation("PlaylistSongs")
 createdAt       DateTime  @default(now())
 updatedAt       DateTime  @updatedAt
 
@@ -79,6 +78,7 @@ shareurl        String
 image           String
 audiodownload_allowed  Boolean
 content_id_free        Boolean
+playlist        Playlist[] @relation("PlaylistSongs")
 createdAt       DateTime  @default(now())
 updatedAt       DateTime  @updatedAt
 
