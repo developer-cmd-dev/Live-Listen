@@ -49,7 +49,7 @@ playlist_name   String
 private         Boolean
 userId          Int
 user            User @relation(fields: [userId],references: [id])
-songs           Songs[] @relation("PlaylistSongs")
+playlistSongs   PlaylistSongs[]
 createdAt       DateTime  @default(now())
 updatedAt       DateTime  @updatedAt
 
@@ -78,10 +78,19 @@ shareurl        String
 image           String
 audiodownload_allowed  Boolean
 content_id_free        Boolean
-playlist        Playlist[] @relation("PlaylistSongs")
+playlistSongs    PlaylistSongs[]
 createdAt       DateTime  @default(now())
 updatedAt       DateTime  @updatedAt
 
 }
 
+model PlaylistSongs{
+  playlist    Playlist @relation(fields: [playlistId], references: [id])
+  playlistId  Int
+  song        Songs    @relation(fields: [songId], references: [id])
+  songId      Int @unique
+  addedAt     DateTime @default(now())
+  position    Int?
+  @@id([playlistId,songId])
+}
 

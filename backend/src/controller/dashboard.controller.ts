@@ -3,7 +3,6 @@ import axios from "axios";
 import { config } from "dotenv"
 import { CustomError } from "../error/ErrorHandler.js";
 import { PrismaClient } from "@prisma/client";
-import { skip } from "@prisma/client/runtime/library";
 import { number, string } from "zod";
 
 config();

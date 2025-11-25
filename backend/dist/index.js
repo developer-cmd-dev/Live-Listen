@@ -18,7 +18,7 @@ client.$connect().then(() => {
     app.listen(port, () => {
         console.log("Server is running on " + port);
     });
-}).catch(error => console.log(error.message));
+});
 app.use(route);
 app.use(ErrorMiddleware);
 //# sourceMappingURL=index.js.map

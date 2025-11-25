@@ -17,7 +17,6 @@ const authMiddleware = async (req, res, next) => {
         const verifyToken = Jwt.verifyToken(extractToken);
         //@ts-ignore
         const userData = await fetchUser(verifyToken.data);
-        console.log(userData);
         if (userData)
             res.locals = userData;
         if (verifyToken)
