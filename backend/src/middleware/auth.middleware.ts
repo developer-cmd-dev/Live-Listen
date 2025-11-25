@@ -35,6 +35,7 @@ const authMiddleware = async (req: Request, res: Response, next: NextFunction) =
         if (verifyToken) next();
     } else {
         const userData: UserData = req.body;
+        if(!userData) throw new CustomError("Empty User field",404);
         const getUser =await fetchUser(userData.email);
 
         if (getUser) {

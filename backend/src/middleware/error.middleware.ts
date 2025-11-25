@@ -5,12 +5,13 @@ import z, { ZodError } from "zod";
 
 
 const ErrorMiddleware = (err:CustomError,req:Request,res:Response ,next:NextFunction)=>{
-    if(err instanceof Error){
-        
-        res.status(500).json(err.message);
-    }else{
-        res.status(500).json("Internal Server Error");
-    }
+     const status = err.statuscode ?? 500;
+  const message = err.message ?? "Internal Server Error";
+
+  res.status(status).json({
+    success: false,
+    message,
+  });
     next();
 }
 

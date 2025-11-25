@@ -24,6 +24,8 @@ const authMiddleware = async (req, res, next) => {
     }
     else {
         const userData = req.body;
+        if (!userData)
+            throw new CustomError("Empty User field", 404);
         const getUser = await fetchUser(userData.email);
         if (getUser) {
             const comparedPassw = await bcrypt.compare(userData.password, getUser.password);
