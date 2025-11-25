@@ -24,10 +24,11 @@ const createPlaylist = async (req, res) => {
 const addSong = async (req, res) => {
     const data = req.body;
     try {
-        const response = await prisma.playlistSongs.createManyAndReturn({
-            data: data.songs.map((songId) => ({
+        const createdData = data.songsId.map((id) => ({ playlistId: data.playlistId, songsId: id }));
+        const response = await prisma.playlistSongs.createMany({
+            data: data.songsId.map((id) => ({
                 playlistId: data.playlistId,
-                songId: songId
+                songId: id,
             })),
             skipDuplicates: true
         });
@@ -35,8 +36,29 @@ const addSong = async (req, res) => {
     }
     catch (error) {
         if (error instanceof Error)
-            throw new CustomError(error.message, 500);
+            throw new CustomError(error.message + "Message from playlist controller", 500);
     }
 };
-export { createPlaylist, addSong };
+const fetchPlaylist = async (req, res) => {
+    const id = req.body.id;
+    try {
+        const response = await prisma.playlist.findUnique({
+            where: {
+                id: id
+            },
+            include: {
+                playlistSongs: {
+                    include: {
+                        song: true
+                    }
+                },
+            }
+        });
+        res.status(200).json(response);
+    }
+    catch (error) {
+        throw new CustomError("Something went wrong", 500);
+    }
+};
+export { createPlaylist, addSong, fetchPlaylist };
 //# sourceMappingURL=playlist.controller.js.map

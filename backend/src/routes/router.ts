@@ -16,6 +16,7 @@ route.get("/",dashboard);
 route.get("/search/:name",searchController);
 route.post("/create-playlist",authMiddleware,createPlaylist);
 route.post("/add-song",authMiddleware,addSong)
+route.post("/update-playlist",authMiddleware)
 
 
 

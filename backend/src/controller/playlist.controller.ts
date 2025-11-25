@@ -11,7 +11,7 @@ type Playlist={
 
 type AddSong={
     playlistId:number
-    songs:[]
+    songsId:[]
 }
 
 const createPlaylist = async(req:Request,res:Response)=>{
@@ -37,23 +37,33 @@ const createPlaylist = async(req:Request,res:Response)=>{
 
 }
 
+const updatePlaylist = async()=>{
+    
+}
+
 
 const addSong = async (req:Request,res:Response)=>{
     const data:AddSong = req.body;
+
+   
     try {
-     const response = await prisma.playlistSongs.createManyAndReturn({
-        data:data.songs.map((songId:number)=>({
-            playlistId:data.playlistId,
-            songId:songId
-        })),
-        skipDuplicates:true
-      })
+      const createdData = data.songsId.map((id)=>({playlistId:data.playlistId,songsId:id}))
+       const response = await prisma.playlistSongs.createMany({
+            data:data.songsId.map((id)=>({
+                playlistId:data.playlistId,
+                songId:id,
+            })),
+            skipDuplicates:true
+        })
       
       res.status(200).json(response)
     } catch (error:unknown) {
-        if(error instanceof Error) throw new CustomError(error.message,500);
+        if(error instanceof Error) throw new CustomError(error.message+"Message from playlist controller",500);
     }
 
 }
+
+
+
 
 export {createPlaylist,addSong}

@@ -7,7 +7,7 @@ import z, { ZodError } from "zod";
 const ErrorMiddleware = (err:CustomError,req:Request,res:Response ,next:NextFunction)=>{
     if(err instanceof Error){
         
-        res.status(err.statuscode).json(err.message);
+        res.status(500).json(err.message);
     }else{
         res.status(500).json("Internal Server Error");
     }
