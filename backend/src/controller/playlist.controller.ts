@@ -46,6 +46,7 @@ const updatePlaylist = async(req:Request,res:Response)=>{
         try {
             const playlistId = parseInt(req.params.id || "");
         const newData:Playlist = req.body;
+        
             const response = await prisma.playlist.update({
                 where:{
                     id:playlistId,
@@ -63,6 +64,26 @@ const updatePlaylist = async(req:Request,res:Response)=>{
 
             }
         }
+}
+
+
+const deletePlaylist = async(req:Request,res:Response)=>{
+try {
+    
+    const id = parseInt(req.params.id||"");
+    const response = prisma.playlist.delete({
+        where:{
+            id:id
+        },
+        include:{
+            playlistSongs:true
+        }
+    })
+    res.status(200).json(response)
+
+} catch (error:unknown) {
+    if(error instanceof Error) throw new CustomError(error.message,404);
+}    
 }
 
 
@@ -90,4 +111,4 @@ const addSong = async (req:Request,res:Response)=>{
 
 
 
-export {createPlaylist,addSong,updatePlaylist}
+export {createPlaylist,addSong,updatePlaylist,deletePlaylist}

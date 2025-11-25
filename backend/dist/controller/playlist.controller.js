@@ -44,6 +44,24 @@ const updatePlaylist = async (req, res) => {
         }
     }
 };
+const deletePlaylist = async (req, res) => {
+    try {
+        const id = parseInt(req.params.id || "");
+        const response = prisma.playlist.delete({
+            where: {
+                id: id
+            },
+            include: {
+                playlistSongs: true
+            }
+        });
+        res.status(200).json(response);
+    }
+    catch (error) {
+        if (error instanceof Error)
+            throw new CustomError(error.message, 404);
+    }
+};
 const addSong = async (req, res) => {
     const data = req.body;
     try {
@@ -61,5 +79,5 @@ const addSong = async (req, res) => {
             throw new CustomError(error.message + "Message from playlist controller", 500);
     }
 };
-export { createPlaylist, addSong, updatePlaylist };
+export { createPlaylist, addSong, updatePlaylist, deletePlaylist };
 //# sourceMappingURL=playlist.controller.js.map
