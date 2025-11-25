@@ -24,11 +24,11 @@ class Jwt{
            return verify(token,this.secret);
         }catch(error){
             if(error instanceof TokenExpiredError){
-                throw new CustomError("Token expired",404);
+                throw new CustomError("Token expired",401);
             }else if(error instanceof JsonWebTokenError){
-                throw new CustomError(error.message,404);
+                throw new CustomError(error.message,401);
             }else{
-                throw new CustomError("Something went wrong",404);
+                throw new CustomError("Something went wrong",401);
             }
 
            

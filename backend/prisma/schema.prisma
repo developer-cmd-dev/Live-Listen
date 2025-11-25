@@ -48,13 +48,21 @@ id              Int     @id @default(autoincrement())
 playlist_name   String
 private         Boolean
 userId          Int
-user            User @relation(fields: [userId],references: [id])
+user            User @relation(fields: [userId],references: [id],onDelete: Cascade)
 playlistSongs   PlaylistSongs[]
+likedSong       LikedSong
 createdAt       DateTime  @default(now())
 updatedAt       DateTime  @updatedAt
 
 }
 
+model LikedSong{
+  user      User @relation(fields: [userId],references: [id],onDelete: Cascade)
+  userId    Int
+  songs     Songs @relation(fields: [songId],references: [id])
+  songId    Int
+  @@id([userId])
+}
 
 
 model Songs{
@@ -79,13 +87,14 @@ image           String
 audiodownload_allowed  Boolean
 content_id_free        Boolean
 playlistSongs    PlaylistSongs[]
+likedSongs       LikedSong[]
 createdAt       DateTime  @default(now())
 updatedAt       DateTime  @updatedAt
 
 }
 
 model PlaylistSongs{
-  playlist    Playlist @relation(fields: [playlistId], references: [id])
+  playlist    Playlist @relation(fields: [playlistId], references: [id],onDelete:Cascade)
   playlistId  Int
   song        Songs    @relation(fields: [songId], references: [id])
   songId      Int @unique
@@ -93,4 +102,3 @@ model PlaylistSongs{
   position    Int?
   @@id([playlistId,songId])
 }
-
