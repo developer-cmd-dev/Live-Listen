@@ -18,6 +18,8 @@
     "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/pg": "^8.15.6",
+    "@types/websocket": "^1.0.10",
+    "@types/ws": "^8.18.1",
     "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "body-parser": "^2.2.0",
@@ -29,6 +31,8 @@
     "jsonwebtoken": "^9.0.2",
     "pg": "^8.16.3",
     "typescript": "^5.9.3",
+    "websocket": "^1.0.35",
+    "ws": "^8.18.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
