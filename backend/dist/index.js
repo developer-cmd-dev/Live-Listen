@@ -6,9 +6,9 @@ import ErrorMiddleware from './middleware/error.middleware.js';
 import bodyParser from 'body-parser';
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { WebSocketServer } from 'ws';
+import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
-import url from 'url';
+import url, {} from 'url';
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 const client = new PrismaClient();
@@ -33,12 +33,21 @@ client.$connect().then(() => {
         const query = parsedUrl.query;
         switch (query.type) {
             case "create":
-                rooms.push({ roomId: Number(query.roomId), users: ["A"] });
+                rooms.push({ roomId: Number(query.roomId), users: [socket] });
                 console.log(rooms);
                 break;
             case "join":
                 const filtered = rooms.filter((e) => e.roomId === Number(query.roomId));
-                console.log(filtered, "this is join");
+                filtered[0]?.users.push(socket);
+                console.log(filtered);
+                socket.on("message", (data) => {
+                    filtered[0]?.users.forEach((user) => {
+                        if (user.readyState === 1) {
+                            if (socket != user)
+                                user.send(data.toString());
+                        }
+                    });
+                });
             default:
                 break;
         }

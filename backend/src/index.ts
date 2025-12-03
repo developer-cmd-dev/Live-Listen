@@ -6,11 +6,9 @@ import ErrorMiddleware from './middleware/error.middleware.js';
 import bodyParser from 'body-parser';
 import express from 'express';
 import cookieParser from 'cookie-parser'
-import { WebSocketServer } from 'ws';
+import {WebSocketServer,WebSocket } from 'ws';
 import http from 'http'
 import url, { type UrlWithParsedQuery } from 'url'
-import type { ParsedUrlQuery } from 'querystring';
-import { unknown } from 'zod';
 
 
 
@@ -28,7 +26,7 @@ const wss = new WebSocketServer({ noServer: true });
 
 interface Rooms {
     roomId: number;
-    users: string[];
+    users: WebSocket[];
 }
 interface Query{
     roomId:number;
@@ -56,14 +54,20 @@ client.$connect().then(() => {
 
         switch (query.type) {
             case "create":
-                rooms.push({ roomId: Number(query.roomId), users: [] });
+                rooms.push({ roomId: Number(query.roomId), users: [socket] });
                 console.log(rooms)
                 break;
             case "join":
                 const filtered:Rooms[]= rooms.filter((e:Rooms) => e.roomId === Number(query.roomId));
+                filtered[0]?.users.push(socket)
+                console.log(filtered)
+                
                 socket.on("message",(data)=>{
                     filtered[0]?.users.forEach((user)=>{
-                        socket.send(data);
+                        if(user.readyState===1){
+                            if(socket!=user)user.send(data.toString());
+                            
+                        }
                     })
                 })
             default:
