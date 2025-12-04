@@ -1,13 +1,30 @@
-let cache = [];
+import { prisma } from "../utility/PrismaClient.js";
+import redisClient from "../utility/RedisClient.js";
+import { CustomError } from "../error/ErrorHandler.js";
 const startJam = async (req, res) => {
-    const body = req.body;
+    const { roomId, limit, adminPlay, isChatOpen } = req.body;
+    const user = res.locals;
     try {
-        const roomId = Math.floor(Math.random() * 1000);
-        cache.push({ roomId, ...body });
-        res.status(200).json({ roomId, ...body });
+        const response = await prisma.rooms.create({
+            data: {
+                roomId: roomId,
+                limit: limit,
+                adminPlay: adminPlay,
+                isChatOpen: isChatOpen,
+                userId: user.id,
+            }
+        });
+        redisClient.hSet(`activeRooms:${response.roomId}`, {
+            roomId: String(response.roomId),
+            limit: String(response.roomId),
+            adminPlay: String(response.adminPlay),
+            isChatOpen: String(response.isChatOpen)
+        });
+        res.status(200).json(response);
     }
     catch (error) {
-        console.log(error);
+        if (error instanceof Error)
+            throw new CustomError(error.message, 500);
     }
 };
 export { startJam };

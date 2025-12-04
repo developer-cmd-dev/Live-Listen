@@ -22,6 +22,7 @@ model User{
   password  String   
   name      String?
   playlist  Playlist[]
+  rooms     Rooms?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -93,4 +94,15 @@ model PlaylistSongs{
   addedAt     DateTime @default(now())
   position    Int?
   @@id([playlistId,songId])
+}
+
+
+model Rooms{
+  roomId      Int @id 
+  limit       Int
+  adminPlay   Boolean
+  isChatOpen  Boolean
+  userId      Int @unique
+  user        User @relation(fields: [userId],references: [id])
+  createdAt       DateTime  @default(now())
 }
