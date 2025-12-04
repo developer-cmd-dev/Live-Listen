@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser';
 import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
 import url, {} from 'url';
-import { createRoom } from './utility/Websocket.js';
+import { createRoom, joinRoom } from './utility/Websocket.js';
 import redisClient from './utility/RedisClient.js';
 const app = express();
 const port = Number(process.env.PORT) || 3000;
@@ -34,7 +34,8 @@ client.$connect().then(() => {
         if (type == "create") {
             createRoom(socket, String(roomId));
         }
-        else {
+        else if (type == "join") {
+            joinRoom(socket, String(roomId));
         }
     });
     server.listen(port, () => console.log("server is running on " + port));

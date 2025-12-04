@@ -15,7 +15,7 @@ const startJam = async (req, res) => {
                 userId: user.id,
             }
         });
-        const cache = await redisClient.hSet(`activeRooms:${response.roomId}`, {
+        redisClient.hSet(`activeRooms:${response.roomId}`, {
             roomId: String(response.roomId),
             limit: String(response.limit),
             adminPlay: String(response.adminPlay),

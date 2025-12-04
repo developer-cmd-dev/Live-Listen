@@ -9,7 +9,7 @@ import cookieParser from 'cookie-parser'
 import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http'
 import url, { type UrlWithParsedQuery } from 'url'
-import { createRoom } from './utility/Websocket.js';
+import { createRoom, joinRoom } from './utility/Websocket.js';
 import redisClient from './utility/RedisClient.js';
 
 
@@ -47,8 +47,8 @@ client.$connect().then(() => {
 
         if(type=="create"){
             createRoom(socket,String(roomId));
-        }else{
-
+        }else if(type=="join"){
+            joinRoom(socket,String(roomId));
         }
     })
     
