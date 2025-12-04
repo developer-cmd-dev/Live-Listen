@@ -30,7 +30,7 @@ const authMiddleware = async (req, res, next) => {
         if (getUser) {
             const comparedPassw = await bcrypt.compare(userData.password, getUser.password);
             if (comparedPassw) {
-                const accessToken = Jwt.signToken(getUser.email, 60);
+                const accessToken = Jwt.signToken(getUser.email, 120);
                 res.cookie("Access-Token", accessToken);
                 res.locals = getUser;
                 next();

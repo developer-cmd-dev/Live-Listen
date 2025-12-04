@@ -19,7 +19,7 @@ route.post("/create-playlist",authMiddleware,createPlaylist);
 route.post("/add-song",authMiddleware,addSong)
 route.put("/update-playlist/:id",authMiddleware,updatePlaylist);
 route.delete("/delete-playlist/:id",authMiddleware,deletePlaylist);
-route.get("/start-jam",startJam);
+route.get("/start-jam",authMiddleware,startJam);
 
 
 

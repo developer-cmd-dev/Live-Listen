@@ -10,6 +10,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http'
 import url, { type UrlWithParsedQuery } from 'url'
 import { createRoom } from './utility/Websocket.js';
+import redisClient from './utility/RedisClient.js';
 
 
 
@@ -41,15 +42,16 @@ client.$connect().then(() => {
 
     wss.on('connection', (socket, req) => {
         
-        const parsedUrl = url.parse(socket.url,true);
+        const parsedUrl = url.parse(req.url||"",true);
         const {roomId,type} = parsedUrl.query;
 
         if(type=="create"){
-            createRoom(socket);
+            createRoom(socket,String(roomId));
         }else{
 
         }
     })
+    
 
     server.listen(port, () => console.log("server is running on " + port));
 

@@ -11,16 +11,17 @@ interface StartJam {
 }
 
 interface RoomsData {
-    roomId: number;
     limit: number;
     adminPlay: boolean;
     isChatOpen: boolean;
 }
 
 const startJam = async (req: Request, res: Response) => {
-    const {roomId,limit,adminPlay,isChatOpen}:RoomsData = req.body;
+    const {limit,adminPlay,isChatOpen}:RoomsData = req.body;
     const user = res.locals
+    
     try {
+        const roomId = Math.floor(Math.random()*100000)
        const response = await prisma.rooms.create({
             data:{
                 roomId:roomId,
@@ -31,11 +32,11 @@ const startJam = async (req: Request, res: Response) => {
             }
         })
 
-        redisClient.hSet(
+       const cache = await redisClient.hSet(
             `activeRooms:${response.roomId}`,
             {
                 roomId:String(response.roomId),
-                limit:String(response.roomId),
+                limit:String(response.limit),
                 adminPlay:String(response.adminPlay),
                 isChatOpen:String(response.isChatOpen)
             });

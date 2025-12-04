@@ -10,6 +10,7 @@ import { WebSocketServer, WebSocket } from 'ws';
 import http from 'http';
 import url, {} from 'url';
 import { createRoom } from './utility/Websocket.js';
+import redisClient from './utility/RedisClient.js';
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 const client = new PrismaClient();
@@ -28,10 +29,10 @@ client.$connect().then(() => {
         });
     });
     wss.on('connection', (socket, req) => {
-        const parsedUrl = url.parse(socket.url, true);
+        const parsedUrl = url.parse(req.url || "", true);
         const { roomId, type } = parsedUrl.query;
         if (type == "create") {
-            createRoom(socket);
+            createRoom(socket, String(roomId));
         }
         else {
         }

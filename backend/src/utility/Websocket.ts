@@ -2,14 +2,11 @@ import type WebSocket from "ws";
 import redisClient from "./RedisClient.js";
 
 
-interface UserData{
-    roomId:number;
-}
-
-const createRoom=(socket:WebSocket)=>{
 
 
-    
+const createRoom=async(socket:WebSocket,roomId:string)=>{
+const createdRoomData = await redisClient.hGetAll(`activeRooms:${roomId}`);
+console.log(createdRoomData);    
 
 }
 

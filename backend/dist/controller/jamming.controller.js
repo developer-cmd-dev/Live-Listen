@@ -2,9 +2,10 @@ import { prisma } from "../utility/PrismaClient.js";
 import redisClient from "../utility/RedisClient.js";
 import { CustomError } from "../error/ErrorHandler.js";
 const startJam = async (req, res) => {
-    const { roomId, limit, adminPlay, isChatOpen } = req.body;
+    const { limit, adminPlay, isChatOpen } = req.body;
     const user = res.locals;
     try {
+        const roomId = Math.floor(Math.random() * 100000);
         const response = await prisma.rooms.create({
             data: {
                 roomId: roomId,
@@ -14,9 +15,9 @@ const startJam = async (req, res) => {
                 userId: user.id,
             }
         });
-        redisClient.hSet(`activeRooms:${response.roomId}`, {
+        const cache = await redisClient.hSet(`activeRooms:${response.roomId}`, {
             roomId: String(response.roomId),
-            limit: String(response.roomId),
+            limit: String(response.limit),
             adminPlay: String(response.adminPlay),
             isChatOpen: String(response.isChatOpen)
         });
