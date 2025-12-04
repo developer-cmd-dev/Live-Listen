@@ -20,6 +20,7 @@ app.use(express.json());
 app.use(cookieParser());
 const server = http.createServer(app);
 const wss = new WebSocketServer({ noServer: true });
+let rooms = new Map();
 client.$connect().then(() => {
     console.log("Db is connected");
     server.on('upgrade', (req, socket, head) => {
@@ -28,15 +29,24 @@ client.$connect().then(() => {
             wss.emit("connection", ws, req);
         });
     });
-    wss.on('connection', (socket, req) => {
+    wss.on('connection', async (socket, req) => {
         const parsedUrl = url.parse(req.url || "", true);
         const { roomId, type } = parsedUrl.query;
         if (type == "create") {
-            createRoom(socket, String(roomId));
+            const roomData = await createRoom(socket, String(roomId));
+            rooms = roomData;
         }
         else if (type == "join") {
-            joinRoom(socket, String(roomId));
+            const roomData = await joinRoom(socket, String(roomId));
+            rooms = roomData;
         }
+        socket.on('message', (data) => {
+            console.log(data);
+            const getUsers = rooms.get(String(roomId));
+            getUsers?.forEach((data) => {
+                data.send("Hi");
+            });
+        });
     });
     server.listen(port, () => console.log("server is running on " + port));
 });

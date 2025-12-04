@@ -28,7 +28,7 @@ const wss = new WebSocketServer({ noServer: true });
 
 
 
-
+let rooms=new Map<string,WebSocket[]>();
 
 
 client.$connect().then(() => {
@@ -40,16 +40,28 @@ client.$connect().then(() => {
         });
     })
 
-    wss.on('connection', (socket, req) => {
+    wss.on('connection',async (socket, req) => {
         
         const parsedUrl = url.parse(req.url||"",true);
         const {roomId,type} = parsedUrl.query;
 
         if(type=="create"){
-            createRoom(socket,String(roomId));
+         const roomData =await createRoom(socket,String(roomId));
+         rooms=roomData;
         }else if(type=="join"){
-            joinRoom(socket,String(roomId));
-        }
+           const roomData = await joinRoom(socket,String(roomId));
+           rooms=roomData;
+        } 
+
+        socket.on('message',(data)=>{
+            console.log(data);
+                 const getUsers = rooms.get(String(roomId));
+                 getUsers?.forEach((data:WebSocket)=>{
+                    data.send("Hi")
+                 })
+
+        })
+      
     })
     
 
