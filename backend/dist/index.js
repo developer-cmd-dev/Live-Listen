@@ -40,11 +40,12 @@ client.$connect().then(() => {
             const roomData = await joinRoom(socket, String(roomId));
             rooms = roomData;
         }
-        socket.on('message', (data) => {
-            console.log(data);
+        socket.on('message', (message) => {
             const getUsers = rooms.get(String(roomId));
             getUsers?.forEach((data) => {
-                data.send("Hi");
+                if (data !== socket) {
+                    data.send(message.toLocaleString());
+                }
             });
         });
     });

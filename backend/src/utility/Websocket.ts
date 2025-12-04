@@ -37,6 +37,8 @@ const joinRoom = async (socket: WebSocket, roomId: string) => {
         }else{
             socket.send("Limit reached");
         }
+    }else{
+        socket.send("Room has ended");
     }
     return rooms;
 }

@@ -25,6 +25,9 @@ const joinRoom = async (socket, roomId) => {
             socket.send("Limit reached");
         }
     }
+    else {
+        socket.send("Room has ended");
+    }
     return rooms;
 };
 export { createRoom, joinRoom };

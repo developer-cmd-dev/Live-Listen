@@ -53,11 +53,12 @@ client.$connect().then(() => {
            rooms=roomData;
         } 
 
-        socket.on('message',(data)=>{
-            console.log(data);
+        socket.on('message',(message)=>{
                  const getUsers = rooms.get(String(roomId));
                  getUsers?.forEach((data:WebSocket)=>{
-                    data.send("Hi")
+                    if(data!==socket){
+                        data.send(message.toLocaleString());
+                    }
                  })
 
         })
