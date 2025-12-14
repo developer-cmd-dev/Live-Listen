@@ -1,5 +1,4 @@
 import { prisma } from "../utility/PrismaClient.js";
-import redisClient from "../utility/RedisClient.js";
 import { CustomError } from "../error/ErrorHandler.js";
 const startJam = async (req, res) => {
     const { limit, adminPlay, isChatOpen } = req.body;
@@ -14,12 +13,6 @@ const startJam = async (req, res) => {
                 isChatOpen: isChatOpen,
                 userId: user.id,
             }
-        });
-        redisClient.hSet(`activeRooms:${response.roomId}`, {
-            roomId: String(response.roomId),
-            limit: String(response.limit),
-            adminPlay: String(response.adminPlay),
-            isChatOpen: String(response.isChatOpen)
         });
         res.status(200).json(response);
     }
