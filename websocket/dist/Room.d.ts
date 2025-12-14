@@ -3,7 +3,7 @@ declare class Room {
     private roomId;
     name: string;
     userId: number;
-    private users;
+    users: Map<number, User>;
     constructor(roomId: number, name: string, userId: number);
     setUser(user: User, userId: number): void;
     destroyUser(userId: number): void;

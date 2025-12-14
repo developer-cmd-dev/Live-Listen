@@ -6,7 +6,7 @@ class Room{
     private roomId:number;
     public name:string;
     public userId:number;
-    private users=new Map<number,User>();
+    public users=new Map<number,User>();
     
 
     constructor(roomId:number,name:string,userId:number){

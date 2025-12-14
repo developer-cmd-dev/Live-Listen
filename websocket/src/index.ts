@@ -5,7 +5,6 @@ import url from 'url'
 import { parse as parseQuery } from 'querystring'
 import User from './User.js';
 import Response from './Response.js';
-import { convertToObject } from 'typescript';
 
 let roomsMap = new Map<string, Room>;
 
@@ -27,7 +26,6 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         const { roomId, type, name, userId }: Query = parseQuery(parsedUrl.query || "") as unknown as Query;
         if (type === "create") {
             const room = new Room(Number(roomId), name, userId);
-            const user = new User(23, "devkumar", socket)
             room.setUser(new User(userId, name, socket), userId);
             roomsMap.set(roomId, room);
 
@@ -38,20 +36,35 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
 
             const getRoom = roomsMap.get(roomId);
             getRoom?.setUser(new User(userId, name, socket), userId)
-            console.log(roomsMap)
 
         }
+
+
+
+        
+        socket.on('message',(data)=>{
+            const getRoom = roomsMap.get(roomId);
+            const usersMap:Map<number,User> |undefined= getRoom?.users;
+
+            usersMap?.forEach(({userSocket})=>{
+                if(userSocket!=socket){
+                    userSocket.send(data.toLocaleString())
+
+                }
+            })
+
+        })
+
+
 
         socket.on('close', () => {
             console.log("socket has disconnected", roomId)
             if (type === "create") {
                 roomsMap.delete(roomId);
-                console.log(roomsMap, " room deleted")
 
             } else if (type === "join") {
                 const getRoom = roomsMap.get(roomId);
                 getRoom?.destroyUser(userId);
-                console.log(roomsMap, " user deleted")
             }
         })
 

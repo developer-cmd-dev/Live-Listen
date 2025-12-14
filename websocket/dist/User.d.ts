@@ -2,7 +2,7 @@ import type WebSocket from "ws";
 declare class User {
     userId: number;
     name: string;
-    socket: any;
+    userSocket: any;
     constructor(userId: number, name: string, socket: WebSocket);
 }
 export default User;

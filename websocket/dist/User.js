@@ -1,11 +1,11 @@
 class User {
     userId;
     name;
-    socket;
+    userSocket;
     constructor(userId, name, socket) {
         this.userId = userId;
         this.name = name;
-        this.socket = socket;
+        this.userSocket = socket;
     }
 }
 export default User;
