@@ -16,10 +16,24 @@ type Query = {
 };
 
 
+interface ChatMessage{
+    name:string;
+    userId:string;
+    message:string;
+    date:number;
+    songRequest:{
+        songId:number;
+        name:string;
+    }|null;
+} 
+
+const port = 3001;
 
 
-const wss = new WebSocketServer({ port: 3001 });
+const wss = new WebSocketServer({ port: port });
+console.log("Websocket is running on "+port)
 wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
+
     try {
         const getUrl = req.url;
         const parsedUrl = url.parse(getUrl || "");
@@ -46,9 +60,15 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
             const getRoom = roomsMap.get(roomId);
             const usersMap:Map<number,User> |undefined= getRoom?.users;
 
+            const messageData:ChatMessage=JSON.parse(data.toLocaleString());
+
+            messageData.date=Date.now()
+            
+
+
             usersMap?.forEach(({userSocket})=>{
                 if(userSocket!=socket){
-                    userSocket.send(data.toLocaleString())
+                    userSocket.send(JSON.stringify(messageData))
 
                 }
             })

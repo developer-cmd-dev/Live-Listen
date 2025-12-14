@@ -5,7 +5,9 @@ import { parse as parseQuery } from 'querystring';
 import User from './User.js';
 import Response from './Response.js';
 let roomsMap = new Map;
-const wss = new WebSocketServer({ port: 3001 });
+const port = 3001;
+const wss = new WebSocketServer({ port: port });
+console.log("Websocket is running on " + port);
 wss.on('connection', (socket, req) => {
     try {
         const getUrl = req.url;
@@ -27,9 +29,11 @@ wss.on('connection', (socket, req) => {
         socket.on('message', (data) => {
             const getRoom = roomsMap.get(roomId);
             const usersMap = getRoom?.users;
-            usersMap?.forEach(({ userSocket, name }) => {
+            const messageData = JSON.parse(data.toLocaleString());
+            messageData.date = Date.now();
+            usersMap?.forEach(({ userSocket }) => {
                 if (userSocket != socket) {
-                    userSocket.send(data.toLocaleString());
+                    userSocket.send(JSON.stringify(messageData));
                 }
             });
         });
