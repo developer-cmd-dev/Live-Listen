@@ -1,11 +1,18 @@
 class Room {
     roomId;
-    users = [];
-    constructor(roomId) {
+    name;
+    userId;
+    users = new Map();
+    constructor(roomId, name, userId) {
         this.roomId = roomId;
+        this.name = name;
+        this.userId = userId;
     }
-    setUser(user) {
-        this.users.push(user);
+    setUser(user, userId) {
+        this.users.set(userId, user);
+    }
+    destroyUser(userId) {
+        this.users.delete(userId);
     }
     getUsers() { return this.users; }
     ;
