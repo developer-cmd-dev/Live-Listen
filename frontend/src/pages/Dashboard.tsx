@@ -83,7 +83,7 @@ export default function Dashboard() {
                         <div className="flex-1 overflow-auto flex flex-col gap-3">
 
                             {songs?.length > 0 ? songs?.map((songs) => (
-                                <SongsRow songs={songs} />
+                                <SongsRow key={songs.id} songs={songs} />
                             )) : Array.from({ length: 50 }).map(() => (<SongRowSkeleton />))}
                         </div>
                     </section>

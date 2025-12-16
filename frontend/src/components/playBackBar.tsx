@@ -1,7 +1,23 @@
+import { useState } from "react"
 import { Button } from "./ui/button"
 import { Slider } from "./ui/slider"
 import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2 } from "lucide-react"
+import type { Songs } from "@/pages/Dashboard"
+import useSongState from "@/store/zustand"
 function PlayBackBar() {
+
+
+
+  const song=useSongState((state)=>state.song);
+
+  
+
+
+  
+
+
+
+
   return (
 
     <div className=" border-2 flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
@@ -10,27 +26,26 @@ function PlayBackBar() {
 
 
         <section className=" h-full flex-1/2">
-          <img className="w-full h-full rounded-full" src="/SongsConver/Cover1.jpg" alt="" />
+          <img className="w-full h-full rounded-full border-none" src={song?.image} alt="Non" />
 
         </section>
 
         <section className="h-full flex-1/2 p-4 flex flex-col justify-center gap-2 overflow-hidden">
           <h1 className="text-2xl sm:text-3xl font-medium font-[cursive] truncate">
-            Tum he ho
+            {song?.name}
           </h1>
 
           <p className="text-base sm:text-lg text-white/60 truncate">
-            Arijit Singh
+            {song?.artist_name}
           </p>
 
           <p className="text-sm sm:text-base text-white/40 truncate">
-            Aashiqui 2 • 2013
+           {song?.album_name}
           </p>
 
           <div className="flex items-center gap-3 mt-2 text-sm text-white/50">
-            <span>03:45</span>
-            <span>•</span>
-            <span>Bollywood</span>
+            <span>{(song?.duration||0/60).toFixed(2)}</span>
+
           </div>
         </section>
 

@@ -1,10 +1,25 @@
 import type { Songs } from '@/pages/Dashboard'
-import React from 'react'
+import React, { useState } from 'react'
+import { Button } from './ui/button'
+import useSongState from '@/store/zustand'
 
 
 
 
 function SongsRow({songs}: {songs: Songs}) {
+
+    const setSongstate = useSongState((state)=>state.setSong);
+
+    const playSong = ()=>{
+        setSongstate(songs);
+    }
+
+
+
+
+
+
+
     return (
         <div key={songs.id} className="w-full h-14 sm:h-16 rounded-lg bg-input/30 flex items-center px-3 gap-3">
             {/* Cover */}
@@ -29,9 +44,9 @@ function SongsRow({songs}: {songs: Songs}) {
             </span>
 
             {/* Play */}
-            <button className="p-2 hover:bg-input/50 rounded-full">
+            <Button onClick={playSong}  variant={"ghost"} className="p-2 hover:bg-input/50 rounded-full">
                 ▶
-            </button>
+            </Button>
 
             {/* 3-dot menu */}
             <button className="p-2 hover:bg-input/50 rounded-full">
@@ -43,3 +58,5 @@ function SongsRow({songs}: {songs: Songs}) {
 }
 
 export default SongsRow
+
+
