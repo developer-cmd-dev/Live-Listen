@@ -1,33 +1,22 @@
 
-import { Separator } from "@/components/ui/separator"
-import {
-    SidebarInset,
-    SidebarProvider,
-    SidebarTrigger,
-} from "@/components/ui/sidebar"
-import { AppSidebar } from "@/components/app-sidebar"
-import SongSearch from "@/components/song-search"
 import { useEffect, useState } from "react"
 import axios from 'axios'
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search } from "lucide-react"
-import { cn } from "@/lib/utils"
-import { Card, CardHeader, CardDescription, CardTitle, CardAction, CardFooter } from "@/components/ui/card";
-import { Badge } from "lucide-react"
+import { Album, Search } from "lucide-react"
+import SongRowSkeleton from "@/components/SongRowSkeleton"
+import SongsRow from "@/components/SongsRow"
+
 export default function Dashboard() {
 
-    const [album, setAlbum] = useState<Album[]>([])
-    const [count, setCount] = useState<number>(0)
+    const [songs, setSongs] = useState<Songs[]>([])
 
 
 
     useEffect(() => {
         (async () => {
             const response = await axios.get("http://localhost:3000/");
-            const album: Album[] = response.data.album;
-            setAlbum(album);
-
+            setSongs(response.data.songs)
         })()
     }, [])
 
@@ -41,17 +30,23 @@ export default function Dashboard() {
     return (
         <div className="h-screen flex flex-col">
             {/* Header */}
-            <header className="w-full h-14 sm:h-16 flex items-center justify-center px-2 sm:px-4">
-                <div className="w-full max-w-3xl flex items-center gap-2">
+            <header className="relative w-full h-14 sm:h-16 flex items-center px-2 sm:px-4">
+                {/* Logo - Left */}
+                <div className="absolute left-5 sm:left-4 h-full sm:h-12 w-32 rounded-2xl  overflow-hidden flex items-center justify-center">
+                    <img
+                        src="/Logo/Logo.png"
+                        alt="LiveListen logo"
+                        className="w-full h-full"
+                    />
+                </div>
+
+                {/* Search - Center */}
+                <div className="mx-auto w-full max-w-3xl flex items-center gap-2">
                     <Input
                         className="border-none w-full text-sm sm:text-base"
                         placeholder="Search Song"
                     />
-                    <Button
-                        type="button"
-                        className="shrink-0"
-                        variant="secondary"
-                    >
+                    <Button type="button" className="shrink-0" variant="secondary">
                         <Search className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
                 </div>
@@ -68,10 +63,12 @@ export default function Dashboard() {
                         </h1>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
-                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
-                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
-                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
+                            {
+                                ablumArray.map((albums, id) => (
+                                    <div key={id} className={`w-60 aspect-square rounded-xl bg-[url(${albums.imageUrl})] bg-center bg-no-repeat bg-cover`}></div>
+                                ))
+                            }
+
                         </div>
                     </section>
 
@@ -83,40 +80,10 @@ export default function Dashboard() {
 
                         {/* ONLY this scrolls */}
                         <div className="flex-1 overflow-auto flex flex-col gap-3">
-                            <div className="w-full h-14 sm:h-16 rounded-lg bg-input/30 flex items-center px-3 gap-3">
-                                {/* Cover */}
-                                <img
-                                    src="/SongsConver/Cover1.jpg"
-                                    alt="cover"
-                                    className="h-10 w-10 sm:h-12 sm:w-12 rounded"
-                                />
 
-                                {/* Name + Artist */}
-                                <div className="flex-1 flex flex-col justify-center overflow-hidden">
-                                    <p className="text-sm font-medium truncate">
-                                        Tum Hi Ho
-                                    </p>
-                                    <p className="text-xs text-muted-foreground truncate">
-                                        Arijit Singh
-                                    </p>
-                                </div>
-                                {/* Duration */}
-                                <span className="hidden sm:block text-xs text-muted-foreground">
-                                    4:22
-                                </span>
-
-                                {/* Play */}
-                                <button className="p-2 hover:bg-input/50 rounded-full">
-                                    ▶
-                                </button>
-
-                                {/* 3-dot menu */}
-                                <button className="p-2 hover:bg-input/50 rounded-full">
-                                    ⋮
-                                </button>
-
-                            </div>
-
+                            {songs?.length > 0 ? songs?.map((songs) => (
+                                <SongsRow songs={songs} />
+                            )) : Array.from({ length: 50 }).map(() => (<SongRowSkeleton />))}
                         </div>
                     </section>
                 </div>
@@ -134,17 +101,56 @@ export default function Dashboard() {
 
 
 
-interface Album {
+export interface Songs {
     id: number;
     name: string;
-    releasedate: string;
+    duration: number; // seconds
+
     artist_id: string;
     artist_name: string;
-    image: string;
-    zip: string;
+    artist_idstr: string;
+
+    album_name: string;
+    album_id: string;
+    album_image: string;
+
+    position: number;
+    releasedate: string;
+    license_ccurl: string;
+
+    audio: string;
+    audiodownload: string;
+    audiodownload_allowed: boolean;
+
+    prourl: string;
     shorturl: string;
-    shareUrl: string;
-    zip_allowed: boolean,
+    shareurl: string;
+
+    image: string;
+
+    content_id_free: boolean;
+
     createdAt: string;
     updatedAt: string;
 }
+
+const ablumArray = [
+    {
+        id: 1,
+        imageUrl: "https://i.pinimg.com/736x/a9/44/89/a944896af0b216796ae695e7bdb7cfab.jpg"
+    },
+    {
+        id: 2,
+        imageUrl: "/SongsConver/Cover1.jpg"
+    },
+    {
+        id: 3,
+        imageUrl: "https://i.pinimg.com/736x/60/9a/80/609a8061a8ae93f2735f3e3e20190b90.jpg"
+    },
+    {
+        id: 4,
+        imageUrl: "https://m.media-amazon.com/images/I/81Tw4klE3nL._USNaN_BL10_BG34,34,34_CLa%7CNaN,NaN%7C81Tw4klE3nL.jpg,81KvkEtJBZL.jpg,918xRUqnGBL.jpg,91Fervhn2UL.jpg%7C0,0,NaN,NaN+0,0,NaN,NaN+NaN,0,NaN,NaN+0,NaN,NaN,NaN+NaN,NaN,NaN,NaN.jpg"
+    },
+
+
+]
