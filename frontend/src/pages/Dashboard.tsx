@@ -9,7 +9,12 @@ import { AppSidebar } from "@/components/app-sidebar"
 import SongSearch from "@/components/song-search"
 import { useEffect, useState } from "react"
 import axios from 'axios'
-
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
+import { Search } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { Card, CardHeader, CardDescription, CardTitle, CardAction, CardFooter } from "@/components/ui/card";
+import { Badge } from "lucide-react"
 export default function Dashboard() {
 
     const [album, setAlbum] = useState<Album[]>([])
@@ -26,21 +31,6 @@ export default function Dashboard() {
     }, [])
 
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setCount(prev => {
-                if (prev < album.length - 1) {
-                    return prev + 1;
-                } else {
-                    return 0;
-                }
-            });
-        }, 10000);
-
-        return () => clearInterval(interval); // cleanup
-    }, [album.length]);
-
-
 
 
 
@@ -48,48 +38,61 @@ export default function Dashboard() {
 
 
     return (
-        <SidebarProvider>
-            <AppSidebar />
-            <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-
-                    <SidebarTrigger className="-ml-1" />
-                    <Separator
-                        orientation="vertical"
-                        className="mr-2 data-[orientation=vertical]:h-4"
+        <div className="h-screen flex flex-col">
+            {/* Header */}
+            <header className="w-full h-14 sm:h-16 flex items-center justify-center px-2 sm:px-4">
+                <div className="w-full max-w-3xl flex items-center gap-2">
+                    <Input
+                        className="border-none w-full text-sm sm:text-base"
+                        placeholder="Search Song"
                     />
+                    <Button
+                        type="button"
+                        className="shrink-0"
+                        variant="secondary"
+                    >
+                        <Search className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </Button>
+                </div>
+            </header>
 
+            {/* Main */}
+            <main className="flex-1 flex flex-col md:flex-col lg:flex-row gap-4 justify-center overflow-hidden p-3 ">
+                <div className="w-full lg:flex-[2] h-full rounded-md overflow-auto bg-input/10 p-4 sm:p-5 space-y-6">
 
-                    <SongSearch />
+                    {/* Albums */}
+                    <section className="space-y-4">
+                        <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
+                            Albums
+                        </h1>
 
-
-
-                </header>
-
-                <div className="flex flex-1   gap-4 p-4  w-full ">
-                    <div className="  flex   flex-col gap-4  h-[90vh] w-full  md:w-[70%] ">
-                        <div className={`bg-muted/50 min-h-[100vh]   flex-1 item-center justify-center  rounded-xl md:min-h-min  `}>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                            <div className="rounded-xl bg-input/30 aspect-square"></div>
+                            <div className="rounded-xl bg-input/30 aspect-square"></div>
+                            <div className="rounded-xl bg-input/30 aspect-square"></div>
+                            <div className="rounded-xl bg-input/30 aspect-square"></div>
                         </div>
-                        <div className="flex overflow-scroll  flex-1 flex-col gap-4 p-4">
-                            {Array.from({ length: 24 }).map((_, index) => (
-                                <div
-                                    key={index}
-                                    className="bg-muted/50 aspect-video h-12 w-full rounded-lg"
-                                />
-                            ))}
-                        </div>
-                    </div>
+                    </section>
 
-                    <div className="hidden md:block h-full bg-gray-800 rounded-xl w-[30%] p-4">
-                        <h1>This anohter div</h1>
-                    </div>
+                    {/* Songs */}
+                    <section className="space-y-4">
+                        <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
+                            Songs
+                        </h1>
+
+                        {/* song list / grid */}
+                    </section>
 
                 </div>
 
 
 
-            </SidebarInset>
-        </SidebarProvider>
+                <div className="w-full lg:flex-1 h-full bg-input/10  rounded-md overflow-auto">
+                </div>
+            </main>
+
+        </div>
+
     )
 }
 
