@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Album, Search } from "lucide-react"
 import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
+import PlayBackBar from "@/components/playBackBar"
 
 export default function Dashboard() {
 
@@ -65,7 +66,7 @@ export default function Dashboard() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                             {
                                 ablumArray.map((albums, id) => (
-                                    <div key={id} className={`w-60 aspect-square rounded-xl bg-[url(${albums.imageUrl})] bg-center bg-no-repeat bg-cover`}></div>
+                                    <div key={id} className={`w-55 aspect-square rounded-xl bg-[url(${albums.imageUrl})] bg-center bg-no-repeat bg-cover`}></div>
                                 ))
                             }
 
@@ -90,7 +91,15 @@ export default function Dashboard() {
 
 
 
-                <div className="w-full lg:flex-1 h-full bg-input/10  rounded-md overflow-auto">
+                <div className="w-full  lg:flex-1 h-full bg-input/10 rounded-xl p-3 bg-[url('/Backgrounds/JammingBg')] bg-no-repeat bg-center bg-cover flex flex-col gap-4 ">
+                
+                   <PlayBackBar/>
+
+
+                    <div className="border-2 flex-1 h-72  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
+
+
+                    </div>
                 </div>
             </main>
 
