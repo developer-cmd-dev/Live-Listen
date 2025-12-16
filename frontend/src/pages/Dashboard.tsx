@@ -21,6 +21,7 @@ export default function Dashboard() {
     const [count, setCount] = useState<number>(0)
 
 
+
     useEffect(() => {
         (async () => {
             const response = await axios.get("http://localhost:3000/");
@@ -67,22 +68,57 @@ export default function Dashboard() {
                         </h1>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                            <div className="rounded-xl bg-input/30 aspect-square"></div>
-                            <div className="rounded-xl bg-input/30 aspect-square"></div>
-                            <div className="rounded-xl bg-input/30 aspect-square"></div>
-                            <div className="rounded-xl bg-input/30 aspect-square"></div>
+                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
+                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
+                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
+                            <div className="w-60 aspect-square rounded-xl bg-[url(/SongsConver/Cover1.jpg)] bg-center bg-no-repeat bg-cover"></div>
                         </div>
                     </section>
 
                     {/* Songs */}
-                    <section className="space-y-4">
+                    <section className="flex flex-col flex-1 space-y-4 min-h-0">
                         <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
                             Songs
                         </h1>
 
-                        {/* song list / grid */}
-                    </section>
+                        {/* ONLY this scrolls */}
+                        <div className="flex-1 overflow-auto flex flex-col gap-3">
+                            <div className="w-full h-14 sm:h-16 rounded-lg bg-input/30 flex items-center px-3 gap-3">
+                                {/* Cover */}
+                                <img
+                                    src="/SongsConver/Cover1.jpg"
+                                    alt="cover"
+                                    className="h-10 w-10 sm:h-12 sm:w-12 rounded"
+                                />
 
+                                {/* Name + Artist */}
+                                <div className="flex-1 flex flex-col justify-center overflow-hidden">
+                                    <p className="text-sm font-medium truncate">
+                                        Tum Hi Ho
+                                    </p>
+                                    <p className="text-xs text-muted-foreground truncate">
+                                        Arijit Singh
+                                    </p>
+                                </div>
+                                {/* Duration */}
+                                <span className="hidden sm:block text-xs text-muted-foreground">
+                                    4:22
+                                </span>
+
+                                {/* Play */}
+                                <button className="p-2 hover:bg-input/50 rounded-full">
+                                    ▶
+                                </button>
+
+                                {/* 3-dot menu */}
+                                <button className="p-2 hover:bg-input/50 rounded-full">
+                                    ⋮
+                                </button>
+
+                            </div>
+
+                        </div>
+                    </section>
                 </div>
 
 
