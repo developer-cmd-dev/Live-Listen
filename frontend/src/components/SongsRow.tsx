@@ -1,27 +1,28 @@
 import type { Songs } from '@/pages/Dashboard'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import { Button } from './ui/button'
 import useSongState from '@/store/zustand'
+import { EllipsisVertical, Menu, Play, UserStar } from 'lucide-react';
+
+interface SongsData {
+    songs:Songs;
+    playSongs:(id:number)=>void;
+    activeSong:number;
+}
 
 
 
-
-function SongsRow({songs}: {songs: Songs}) {
+function SongsRow({songs,playSongs,activeSong}:SongsData) {
 
     const setSongstate = useSongState((state)=>state.setSong);
-
-    const playSong = ()=>{
-        setSongstate(songs);
-    }
-
-
-
+ 
+    
 
 
 
 
     return (
-        <div key={songs.id} className="w-full h-14 sm:h-16 rounded-lg bg-input/30 flex items-center px-3 gap-3">
+        <div key={songs.id}   className={`w-full h-14 sm:h-16 rounded-lg bg-input/30 flex items-center px-3 gap-3 ${activeSong == songs.id ? "bg-input/70":"bg-input/30"} `}>
             {/* Cover */}
             <img
                 src={songs.album_image}
@@ -44,14 +45,15 @@ function SongsRow({songs}: {songs: Songs}) {
             </span>
 
             {/* Play */}
-            <Button onClick={playSong}  variant={"ghost"} className="p-2 hover:bg-input/50 rounded-full">
-                ▶
+            <Button onClick={()=>playSongs(songs.id)}  variant={"ghost"} className="p-2 hover:bg-input/50 rounded-full">
+               <Play/>
             </Button>
 
             {/* 3-dot menu */}
-            <button className="p-2 hover:bg-input/50 rounded-full">
-                ⋮
-            </button>
+               <Button title='menu'    variant={"ghost"} className="p-2 
+                hover:bg-input/50 rounded-full">
+               <EllipsisVertical/>
+            </Button>
 
         </div>
     )

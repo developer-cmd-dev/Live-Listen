@@ -5,6 +5,7 @@ import {createBrowserRouter} from "react-router";
 import { RouterProvider } from 'react-router';
 import Dashboard from './pages/Dashboard.tsx';
 import Login from './pages/Login.tsx';
+import { Toaster } from 'sonner';
 
 
 
@@ -29,5 +30,6 @@ const router = createBrowserRouter([
 
 
 createRoot(document.getElementById('root')!).render(
+    
     <RouterProvider router={router}/>
 )

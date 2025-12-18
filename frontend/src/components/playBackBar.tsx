@@ -44,7 +44,7 @@ function PlayBackBar() {
           </p>
 
           <div className="flex items-center gap-3 mt-2 text-sm text-white/50">
-            <span>{(song?.duration||0/60).toFixed(2)}</span>
+            <span>{((song?.duration||0)/60).toFixed(2)}</span>
 
           </div>
         </section>
@@ -56,7 +56,7 @@ function PlayBackBar() {
 
         {/* Progress bar */}
         <div className="flex items-center gap-3 text-xs  text-white/60">
-          <Slider defaultValue={[33]} max={100} step={1} />
+          <Slider defaultValue={[0]} max={100} step={1} />
 
         </div>
 
@@ -81,7 +81,7 @@ function PlayBackBar() {
 
           {/* Right menu */}
           <div className="flex items-center gap-4 w-[7vw]  text-white/70">
-            <Slider defaultValue={[33]} max={100} step={1} />
+            <Slider defaultValue={[0]} max={100} step={1} />
             <Volume2 size={40} />
 
           </div>
