@@ -8,12 +8,13 @@ import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
+import useSongState from "@/store/zustand"
+import Navbar from "@/components/Navbar"
 
 export default function Dashboard() {
 
     const [songs, setSongs] = useState<Songs[]>([])
-    const [error,setError]=useState(false)
-    const [playingSong,setPlayingSong]=useState<number|null>(null)
+    const [playingSong, setPlayingSong] = useState<number | null>(null)
 
 
 
@@ -22,21 +23,20 @@ export default function Dashboard() {
             try {
                 const response = await axios.get("http://localhost:3000/");
                 setSongs(response.data.songs);
-
             } catch (error) {
                 if (error instanceof AxiosError) {
-                    
                     toast.error(error.message);
-                    setError(true);
                 }
             }
         })()
     }, [])
 
+    const setSong = useSongState((state) => state.setSong)
 
 
-    const playSong = (id:number)=>{
-       setPlayingSong(id);
+    const playSong = (id: number, songData: Songs) => {
+        setPlayingSong(id);
+        setSong(songData)
 
     }
 
@@ -50,8 +50,8 @@ export default function Dashboard() {
     return (
         <div className="h-screen flex flex-col">
             {/* Header */}
-          
 
+            <Navbar />
             {/* Main */}
             <main className="flex-1 flex flex-col md:flex-col lg:flex-row gap-4 justify-center overflow-hidden p-3 ">
                 <div className="w-full lg:flex-[2] h-full rounded-md overflow-auto bg-input/10 p-4 sm:p-5 space-y-6">
@@ -65,10 +65,10 @@ export default function Dashboard() {
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
                             {
                                 ablumArray.map((albums) => (
-                                    <div className={`w-55  aspect-square rounded-xl  bg-center bg-no-repeat bg-cover`}
-                                    style={{
-                                        backgroundImage:`url(${albums.imageUrl})`
-                                    }}></div>
+                                    <div key={albums.id} className={`w-55  aspect-square rounded-xl  bg-center bg-no-repeat bg-cover`}
+                                        style={{
+                                            backgroundImage: `url(${albums.imageUrl})`
+                                        }}></div>
                                 ))
                             }
 
@@ -85,7 +85,7 @@ export default function Dashboard() {
                         <div className="flex-1 overflow-auto flex flex-col gap-3">
 
                             {songs?.length > 0 ? songs?.map((songs) => (
-                                <SongsRow activeSong={playingSong} playSongs={playSong} key={songs.id} songs={songs} />
+                                <SongsRow  activeSong={playingSong} playSongs={playSong} key={songs.id} songs={songs} />
                             )) : Array.from({ length: 4 }).map(() => (<SongRowSkeleton />))}
                         </div>
                     </section>
@@ -95,7 +95,10 @@ export default function Dashboard() {
 
                 <div className="w-full  lg:flex-1 h-full bg-input/10 rounded-xl p-3 bg-[url('/Backgrounds/JammingBg')] bg-no-repeat bg-center bg-cover flex flex-col gap-4 ">
 
-                    <PlayBackBar />
+                    <div className=" border-2 flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
+                        <PlayBackBar />
+
+                    </div>
 
 
                     <div className="border-2 flex-1 h-72  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">

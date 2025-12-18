@@ -1,7 +1,7 @@
-import { useState } from "react"
+import { useActionState, useEffect, useState } from "react"
 import { Button } from "./ui/button"
 import { Slider } from "./ui/slider"
-import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2 } from "lucide-react"
+import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2, Palette } from "lucide-react"
 import type { Songs } from "@/pages/Dashboard"
 import useSongState from "@/store/zustand"
 function PlayBackBar() {
@@ -11,8 +11,14 @@ function PlayBackBar() {
   const song=useSongState((state)=>state.song);
 
   
+  const[playbar,setPlaybar]=useState(0)
 
+  useEffect(() => {
 
+    const audio = new Audio(song?.audio);
+    audio.play()
+  }, [song])
+  
   
 
 
@@ -20,13 +26,14 @@ function PlayBackBar() {
 
   return (
 
-    <div className=" border-2 flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
+  song ? (
+     <>
 
       <div className="  flex  gap-2 flex-1 h-[70%]">
 
 
         <section className=" h-full flex-1/2">
-          <img className="w-full h-full rounded-full border-none" src={song?.image} alt="Non" />
+          <img className="w-96 h-48 object-cover rounded-full border-none" src={song?.image} alt="Non" />
 
         </section>
 
@@ -52,18 +59,18 @@ function PlayBackBar() {
 
       </div>
 
-      <div className=" h-full flex flex-col justify-center gap-3">
+      <div className=" h-full flex  flex-col justify-around gap-3">
 
         {/* Progress bar */}
-        <div className="flex items-center gap-3 text-xs  text-white/60">
-          <Slider defaultValue={[0]} max={100} step={1} />
-
+        <div className="flex  items-center gap-3 text-xs  text-white/60">
+          <Slider onValueChange={(e)=>setPlaybar(e[0])} defaultValue={[0]} max={100} step={1} />
+            
         </div>
 
 
 
         {/* Controls */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center  justify-between">
 
           {/* Left menu */}
           <div className="flex items-center gap-4 text-white/70">
@@ -81,7 +88,7 @@ function PlayBackBar() {
 
           {/* Right menu */}
           <div className="flex items-center gap-4 w-[7vw]  text-white/70">
-            <Slider defaultValue={[0]} max={100} step={1} />
+            <Slider  defaultValue={[0]} max={100} step={1} />
             <Volume2 size={40} />
 
           </div>
@@ -89,10 +96,10 @@ function PlayBackBar() {
         </div>
       </div>
 
-
-
-
-    </div>
+    </>
+  ):(
+    <h1>Empty</h1>
+  )
 
   )
 }

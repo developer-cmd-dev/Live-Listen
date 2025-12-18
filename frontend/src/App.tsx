@@ -13,8 +13,10 @@ function App() {
 
  <ThemeProvider defaultTheme='light' storageKey='vite-ui-theme'>
   <Toaster theme='light' position={"top-center"} closeButton={true} />
-  <Navbar/>
+  
     <Outlet/>
+
+
  </ThemeProvider>
  </>
   )
