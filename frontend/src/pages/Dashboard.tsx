@@ -7,7 +7,7 @@ import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
 import { useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
 import Navbar from "@/components/Navbar"
-
+import { RoomAccess } from "@/components/RoomAccess"
 export default function Dashboard() {
 
     const [songs, setSongs] = useState<Songs[]>([])
@@ -143,9 +143,9 @@ export default function Dashboard() {
                     </div>
 
 
-                    <div className="bg-input/30 flex-1 h-72  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
+                    <div className="bg-input/30 flex-1 h-72 p-3  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
 
-
+                            <RoomAccess/>
                     </div>
                 </div>
             </main>

@@ -3,7 +3,6 @@ import axios from "axios";
 import { config } from "dotenv";
 import { CustomError } from "../error/ErrorHandler.js";
 import { PrismaClient } from "@prisma/client";
-import { number, string } from "zod";
 import { redisClient } from "../utility/RedisClient.js";
 config();
 const prisma = new PrismaClient();
