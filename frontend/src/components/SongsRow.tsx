@@ -1,7 +1,7 @@
 import type { Songs } from '@/pages/Dashboard'
 import React, { useRef, useState } from 'react'
 import { Button } from './ui/button'
-import useSongState from '@/store/zustand'
+import {useSongState} from '@/store/zustand'
 import { EllipsisVertical, Menu, Play, UserStar } from 'lucide-react';
 
 interface SongsData {

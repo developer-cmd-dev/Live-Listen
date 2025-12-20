@@ -6,11 +6,24 @@ type SongStore={
     setSong:(song:Songs|undefined)=>void;
 } 
 
+type CurrentSong = {
+    isPlayCurrentSong:boolean;
+    setIsPlayCurrentSong:(value:boolean)=>void;
+
+}
+
 
 
 const useSongState = create<SongStore>((set) =>({
    song:null,
-   setSong:((song)=>set({song}))
+   setSong:((song)=>set({song})),
+   
 }))
 
-export default useSongState;
+const useHandleCurrentSong = create<CurrentSong>((set)=>({
+    isPlayCurrentSong:false,
+    setIsPlayCurrentSong:((value:boolean)=>set({isPlayCurrentSong:value}))
+}))
+
+
+export { useSongState,useHandleCurrentSong};

@@ -8,7 +8,7 @@ import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
-import useSongState from "@/store/zustand"
+import {useHandleCurrentSong, useSongState} from "@/store/zustand"
 import Navbar from "@/components/Navbar"
 
 export default function Dashboard() {
@@ -23,6 +23,8 @@ export default function Dashboard() {
             try {
                 const response = await axios.get("http://localhost:3000/");
                 setSongs(response.data.songs);
+                const lastPlayedSong =await JSON.parse(localStorage.getItem('last-played-song')||"");
+               setSong(lastPlayedSong)
             } catch (error) {
                 if (error instanceof AxiosError) {
                     toast.error(error.message);
@@ -32,12 +34,14 @@ export default function Dashboard() {
     }, [])
 
     const setSong = useSongState((state) => state.setSong)
+    const setIsPlayCurrentSong= useHandleCurrentSong((state)=>state.setIsPlayCurrentSong)
 
 
     const playSong = (id: number, songData: Songs) => {
         setPlayingSong(id);
-        setSong(songData)
-
+        setSong(songData);
+        setIsPlayCurrentSong(true);
+        localStorage.setItem("last-played-song",JSON.stringify(songData))
     }
 
 
