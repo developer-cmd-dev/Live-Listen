@@ -5,7 +5,14 @@ import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2, Palette, Cur
 import { useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
 import { Progress } from "./ui/progress"
 import { Input } from "./ui/input"
-function PlayBackBar() {
+
+type Props = {
+  nextSong:()=>void;
+  previousSong:()=>void;
+}
+
+
+function PlayBackBar({nextSong,previousSong}:Props) {
 
 
 
@@ -179,6 +186,7 @@ function PlayBackBar() {
             {/* Main controls */}
             <div className="flex items-center gap-5">
               <Button
+              onClick={previousSong}
                 variant={"default"}
                 title="previous"
               >
@@ -191,7 +199,7 @@ function PlayBackBar() {
               >
                 {isPlaying ? <Pause /> : <Play />}
               </Button>
-              <Button title="next" variant={"default"}><ChevronLast /></Button>
+              <Button onClick={nextSong} title="next" variant={"default"}><ChevronLast /></Button>
             </div>
 
             {/* Right menu */}

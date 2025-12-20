@@ -11,9 +11,9 @@ import Navbar from "@/components/Navbar"
 export default function Dashboard() {
 
     const [songs, setSongs] = useState<Songs[]>([])
-    const [playingSong, setPlayingSong] = useState<number | null>(null)
+    const [activeSong, setActiveSong] = useState<number | null>(null)
 
-    
+
 
 
 
@@ -34,11 +34,11 @@ export default function Dashboard() {
 
     const setSong = useSongState((state) => state.setSong)
     const setIsPlayCurrentSong = useHandleCurrentSong((state) => state.setIsPlayCurrentSong)
-    const {isPlaying,setIsPlaying}=useIsPlaying((state)=>state);
+    const { isPlaying, setIsPlaying } = useIsPlaying((state) => state);
 
 
     const playSong = (id: number, songData: Songs) => {
-        setPlayingSong(id);
+        setActiveSong(id);
         setSong(songData);
         setIsPlayCurrentSong(true);
         localStorage.setItem("last-played-song", JSON.stringify(songData))
@@ -46,7 +46,34 @@ export default function Dashboard() {
     }
 
 
-  
+    const nextSong = () => {
+
+        if (activeSong && activeSong < songs.length) {
+            setActiveSong(activeSong + 1)
+            handlePrevNext()
+        }
+
+    }
+
+    const previousSong = () => {
+        if (activeSong && activeSong >  0) {
+            setActiveSong(activeSong - 1)
+            handlePrevNext()
+
+        }
+
+    }
+
+    const handlePrevNext = () => {
+          if(activeSong){
+              setSong(songs[activeSong]);
+            setIsPlayCurrentSong(true);
+            localStorage.setItem("last-played-song", JSON.stringify(songs[activeSong]))
+          }
+    }
+
+
+
 
 
 
@@ -78,7 +105,7 @@ export default function Dashboard() {
                                             backgroundImage: `url(${albums.imageUrl})`
                                         }}>
 
-                                        </div>
+                                    </div>
                                 ))
                             }
 
@@ -95,13 +122,13 @@ export default function Dashboard() {
                         <div className="flex-1 overflow-auto flex flex-col gap-3">
 
                             {songs?.length > 0 ? songs?.map((songs) => (
-                                <SongsRow 
-                                activeSong={playingSong} 
-                                playSongs={playSong} 
-                                key={songs.id} 
-                                songs={songs} 
+                                <SongsRow
+                                    activeSong={activeSong}
+                                    playSongs={playSong}
+                                    key={songs.id}
+                                    songs={songs}
                                 />
-                            )) :skeletonArray.map((data) => (<SongRowSkeleton key={data} />))}
+                            )) : skeletonArray.map((data) => (<SongRowSkeleton key={data} />))}
                         </div>
                     </section>
                 </div>
@@ -111,7 +138,7 @@ export default function Dashboard() {
                 <div className="w-full  lg:flex-1 h-full rounded-xl  bg-none flex flex-col gap-4 ">
 
                     <div className="bg-input/30  flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
-                        <PlayBackBar />
+                        <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
 
                     </div>
 
@@ -185,5 +212,5 @@ const ablumArray = [
 ]
 
 
-const skeletonArray = [1,2,3,4]
+const skeletonArray = [1, 2, 3, 4]
 
