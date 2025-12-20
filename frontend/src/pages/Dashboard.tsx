@@ -8,7 +8,7 @@ import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
-import { useHandleCurrentSong, useSongState } from "@/store/zustand"
+import { useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
 import Navbar from "@/components/Navbar"
 
 export default function Dashboard() {
@@ -35,6 +35,7 @@ export default function Dashboard() {
 
     const setSong = useSongState((state) => state.setSong)
     const setIsPlayCurrentSong = useHandleCurrentSong((state) => state.setIsPlayCurrentSong)
+    const {isPlaying,setIsPlaying}=useIsPlaying((state)=>state);
 
 
     const playSong = (id: number, songData: Songs) => {
@@ -42,7 +43,13 @@ export default function Dashboard() {
         setSong(songData);
         setIsPlayCurrentSong(true);
         localStorage.setItem("last-played-song", JSON.stringify(songData))
+        setIsPlaying(!isPlaying);
     }
+
+
+    useEffect(()=>{
+
+    },[])
 
 
 

@@ -1,8 +1,8 @@
 import type { Songs } from '@/pages/Dashboard'
 import React, { useRef, useState } from 'react'
 import { Button } from './ui/button'
-import {useSongState} from '@/store/zustand'
-import { EllipsisVertical, Menu, Play, UserStar } from 'lucide-react';
+import {useIsPlaying, useSongState} from '@/store/zustand'
+import { EllipsisVertical, Menu, Pause, Play, UserStar } from 'lucide-react';
 
 interface SongsData {
     songs:Songs;
@@ -14,6 +14,10 @@ interface SongsData {
 
 function SongsRow({songs,playSongs,activeSong}:SongsData) {
 
+
+
+
+    const {isPlaying} =useIsPlaying((state)=>state); 
  
     
 
@@ -44,8 +48,13 @@ function SongsRow({songs,playSongs,activeSong}:SongsData) {
             </span>
 
             {/* Play */}
-            <Button onClick={()=>playSongs(songs.id,songs)}  variant={"ghost"} className="p-2 hover:bg-input/50 rounded-full">
-               <Play/>
+            <Button 
+            onClick={()=>{
+                playSongs(songs.id,songs)
+            }}  
+            variant={"ghost"} 
+            className="p-2 hover:bg-input/50 rounded-full">
+               {isPlaying && activeSong == songs.id ? <Pause/> :<Play/>}
             </Button>
 
             {/* 3-dot menu */}

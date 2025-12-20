@@ -2,7 +2,7 @@ import { useActionState, useEffect, useRef, useState, type ChangeEvent } from "r
 import { Button } from "./ui/button"
 import { Slider } from "./ui/slider"
 import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2, Palette, Currency, Pause, StepForward } from "lucide-react"
-import {useHandleCurrentSong, useSongState} from "@/store/zustand"
+import { useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
 import { Progress } from "./ui/progress"
 import { Input } from "./ui/input"
 function PlayBackBar() {
@@ -10,83 +10,102 @@ function PlayBackBar() {
 
 
   const song = useSongState((state) => state.song);
-  const isPlayingCurrentSong = useHandleCurrentSong((state)=>state.isPlayCurrentSong);
+  const isPlayingCurrentSong = useHandleCurrentSong((state) => state.isPlayCurrentSong);
 
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const [isPlaying,setIsPlaying]=useState(false);
-  const [currentTime,setCurrentTime]=useState<number>(0);
-  const [duration,setDuration]=useState<number>(0);
+  const { isPlaying, setIsPlaying } = useIsPlaying((state) => state);
+  const [currentTime, setCurrentTime] = useState<number>(0);
+  const [duration, setDuration] = useState<number>(0);
+  const [volume, setVolume] = useState<number>(0.5);
 
- 
- 
-  useEffect(()=>{
+
+
+  useEffect(() => {
     if (!song) return;
 
-   if (!audioRef.current) {
-    audioRef.current = new Audio();
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
     }
-
-  const audio = audioRef.current;
-
-  audio.pause();
-  audio.currentTime = 0;
-
-  audio.src = song.audio;
-  audio.load();
-  setDuration(song.duration)
-  if (isPlayingCurrentSong) {
-    audio.play();
-    setIsPlaying(true);
-    
-  }
-
-    return () => {
-      audio.pause(); 
-    };
-  },[song,isPlayingCurrentSong])
-
-
-
-  useEffect(()=>{
-    if(!audioRef.current) return
 
     const audio = audioRef.current;
 
-    const updateProgress = ()=>{
-      if (audio.duration) {
-      setCurrentTime((audio.currentTime / audio.duration) * 100);
-    }
-    }
+    audio.pause();
+    audio.currentTime = 0;
 
-    audio.addEventListener('timeupdate',updateProgress)
-
-    return ()=>{
-      audio.removeEventListener('timeupdate',updateProgress)
-    }
-
-
-  },[song])
-
- 
-  const handlePlayPause =()=>{
-    if(!isPlaying){
-      audioRef.current?.play();
+    audio.src = song.audio;
+    audio.load();
+    setDuration(song.duration)
+    if (isPlayingCurrentSong) {
+      audio.play();
       setIsPlaying(true);
-    }else{
+
+    }
+
+    return () => {
+      audio.pause();
+    };
+  }, [song, isPlayingCurrentSong])
+
+
+
+  useEffect(() => {
+    if (!audioRef.current) return
+
+    const audio = audioRef.current;
+
+    const updateProgress = () => {
+      if (audio.duration) {
+        // const durationTime = (audio.currentTime/audio.duration)*100;
+        // setCurrentTime(Number(durationTime.toFixed(3)))
+        setCurrentTime(audio.currentTime)
+
+      }
+    }
+
+    audio.addEventListener('timeupdate', updateProgress)
+
+    return () => {
+      audio.removeEventListener('timeupdate', updateProgress)
+    }
+
+
+  }, [song])
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = volume;
+    }
+  }, [volume])
+
+
+
+  const handlePlayPause = () => {
+    if (!isPlaying) {
+      audioRef.current?.play();
+      setIsPlaying(!isPlaying);
+    } else {
       audioRef.current?.pause();
-      setIsPlaying(false);
+      setIsPlaying(!isPlaying);
     }
   }
 
 
 
 
-  const handleSeek=(e:ChangeEvent<HTMLInputElement>)=>{
-    if(audioRef.current){
+  const handleSeek = (e: ChangeEvent<HTMLInputElement>) => {
+    if (audioRef.current) {
       const time = Number((e.target.value))
-          setCurrentTime(time);
+      setCurrentTime(time);
+      audioRef.current.currentTime = time;
+      console.log(e.target.value)
     }
+  }
+
+
+  const handleVolume = (e: ChangeEvent<HTMLInputElement>) => {
+    setVolume((Number(e.target.value) / 2))
+
   }
 
 
@@ -131,12 +150,12 @@ function PlayBackBar() {
 
           {/* Progress bar */}
           <div className="flex  items-center gap-3 text-xs  text-white/60">
-           <Input  
-           max={100} 
-           value={currentTime} 
-           type="range"
-           onChange={handleSeek}
-           />
+            <Input
+              max={duration}
+              value={currentTime}
+              type="range"
+              onChange={handleSeek}
+            />
           </div>
 
 
@@ -154,13 +173,22 @@ function PlayBackBar() {
             {/* Main controls */}
             <div className="flex items-center gap-5">
               <Button variant={"default"}><ChevronFirst /></Button>
-            <Button onClick={handlePlayPause}  variant={"default"}>{isPlaying ? <Pause/>:<Play/>}</Button>
+              <Button
+                onClick={handlePlayPause}
+                variant={"default"}>
+                {isPlaying ? <Pause /> : <Play />}
+              </Button>
               <Button variant={"default"}><ChevronLast /></Button>
             </div>
 
             {/* Right menu */}
             <div className="flex items-center gap-4 w-[7vw]  text-white/70">
-              <Slider  defaultValue={[0]} max={100} step={1} />
+              <Input
+                type="range"
+                onChange={handleVolume}
+                defaultValue={0}
+                max={2}
+                step={0.1} />
               <Volume2 size={40} />
 
             </div>

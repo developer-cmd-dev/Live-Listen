@@ -12,6 +12,11 @@ type CurrentSong = {
 
 }
 
+type IsPlaying = {
+    isPlaying :boolean;
+    setIsPlaying: (value:boolean)=>void;
+}
+
 
 
 const useSongState = create<SongStore>((set) =>({
@@ -26,4 +31,10 @@ const useHandleCurrentSong = create<CurrentSong>((set)=>({
 }))
 
 
-export { useSongState,useHandleCurrentSong};
+const useIsPlaying = create<IsPlaying>((set)=>({
+    isPlaying:false,
+    setIsPlaying:((value:boolean)=>set({isPlaying:value}))
+}))
+
+
+export { useSongState,useHandleCurrentSong,useIsPlaying};
