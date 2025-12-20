@@ -1,4 +1,4 @@
-import { useActionState, useEffect, useRef, useState } from "react"
+import { useActionState, useEffect, useRef, useState, type ChangeEvent } from "react"
 import { Button } from "./ui/button"
 import { Slider } from "./ui/slider"
 import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2, Palette, Currency, Pause, StepForward } from "lucide-react"
@@ -13,7 +13,6 @@ function PlayBackBar() {
   const isPlayingCurrentSong = useHandleCurrentSong((state)=>state.isPlayCurrentSong);
 
 
-  const [playbar, setPlaybar] = useState(0)
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const [isPlaying,setIsPlaying]=useState(false);
   const [currentTime,setCurrentTime]=useState<number>(0);
@@ -24,16 +23,16 @@ function PlayBackBar() {
   useEffect(()=>{
     if (!song) return;
 
-  if (!audioRef.current) {
+   if (!audioRef.current) {
     audioRef.current = new Audio();
-  }
+    }
 
   const audio = audioRef.current;
 
   audio.pause();
   audio.currentTime = 0;
 
-   audio.src = song.audio;
+  audio.src = song.audio;
   audio.load();
   setDuration(song.duration)
   if (isPlayingCurrentSong) {
@@ -83,10 +82,10 @@ function PlayBackBar() {
 
 
 
-  const handleSeek=(e:Event)=>{
+  const handleSeek=(e:ChangeEvent<HTMLInputElement>)=>{
     if(audioRef.current){
-          audioRef.current.currentTime=Number((e.target as HTMLInputElement).value);
-          setCurrentTime ( Number((e.target as HTMLInputElement).value))
+      const time = Number((e.target.value))
+          setCurrentTime(time);
     }
   }
 
@@ -132,7 +131,12 @@ function PlayBackBar() {
 
           {/* Progress bar */}
           <div className="flex  items-center gap-3 text-xs  text-white/60">
-           <Input  max={100} defaultValue={0} value={currentTime} type="range"/>
+           <Input  
+           max={100} 
+           value={currentTime} 
+           type="range"
+           onChange={handleSeek}
+           />
           </div>
 
 

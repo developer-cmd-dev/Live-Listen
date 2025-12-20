@@ -8,7 +8,7 @@ import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
-import {useHandleCurrentSong, useSongState} from "@/store/zustand"
+import { useHandleCurrentSong, useSongState } from "@/store/zustand"
 import Navbar from "@/components/Navbar"
 
 export default function Dashboard() {
@@ -23,8 +23,8 @@ export default function Dashboard() {
             try {
                 const response = await axios.get("http://localhost:3000/");
                 setSongs(response.data.songs);
-                const lastPlayedSong =await JSON.parse(localStorage.getItem('last-played-song')||"");
-               setSong(lastPlayedSong)
+                const lastPlayedSong = await JSON.parse(localStorage.getItem('last-played-song') || "");
+                setSong(lastPlayedSong)
             } catch (error) {
                 if (error instanceof AxiosError) {
                     toast.error(error.message);
@@ -34,14 +34,14 @@ export default function Dashboard() {
     }, [])
 
     const setSong = useSongState((state) => state.setSong)
-    const setIsPlayCurrentSong= useHandleCurrentSong((state)=>state.setIsPlayCurrentSong)
+    const setIsPlayCurrentSong = useHandleCurrentSong((state) => state.setIsPlayCurrentSong)
 
 
     const playSong = (id: number, songData: Songs) => {
         setPlayingSong(id);
         setSong(songData);
         setIsPlayCurrentSong(true);
-        localStorage.setItem("last-played-song",JSON.stringify(songData))
+        localStorage.setItem("last-played-song", JSON.stringify(songData))
     }
 
 
@@ -72,7 +72,9 @@ export default function Dashboard() {
                                     <div key={albums.id} className={`w-55  aspect-square rounded-xl  bg-center bg-no-repeat bg-cover`}
                                         style={{
                                             backgroundImage: `url(${albums.imageUrl})`
-                                        }}></div>
+                                        }}>
+
+                                        </div>
                                 ))
                             }
 
@@ -89,8 +91,13 @@ export default function Dashboard() {
                         <div className="flex-1 overflow-auto flex flex-col gap-3">
 
                             {songs?.length > 0 ? songs?.map((songs) => (
-                                <SongsRow  activeSong={playingSong} playSongs={playSong} key={songs.id} songs={songs} />
-                            )) : Array.from({ length: 4 }).map(() => (<SongRowSkeleton />))}
+                                <SongsRow 
+                                activeSong={playingSong} 
+                                playSongs={playSong} 
+                                key={songs.id} 
+                                songs={songs} 
+                                />
+                            )) :skeletonArray.map((data) => (<SongRowSkeleton key={data} />))}
                         </div>
                     </section>
                 </div>
@@ -172,3 +179,6 @@ const ablumArray = [
 
 
 ]
+
+
+const skeletonArray = [1,2,3,4]
