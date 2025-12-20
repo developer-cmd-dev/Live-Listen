@@ -1,9 +1,6 @@
 
 import { useEffect, useState } from "react"
 import axios, { AxiosError } from 'axios'
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { Album, Search } from "lucide-react"
 import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
@@ -15,6 +12,8 @@ export default function Dashboard() {
 
     const [songs, setSongs] = useState<Songs[]>([])
     const [playingSong, setPlayingSong] = useState<number | null>(null)
+
+    
 
 
 
@@ -47,9 +46,7 @@ export default function Dashboard() {
     }
 
 
-    useEffect(()=>{
-
-    },[])
+  
 
 
 
@@ -111,15 +108,15 @@ export default function Dashboard() {
 
 
 
-                <div className="w-full  lg:flex-1 h-full bg-input/10 rounded-xl p-3 bg-[url('/Backgrounds/JammingBg')] bg-no-repeat bg-center bg-cover flex flex-col gap-4 ">
+                <div className="w-full  lg:flex-1 h-full rounded-xl  bg-none flex flex-col gap-4 ">
 
-                    <div className=" border-2 flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
+                    <div className="bg-input/30  flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
                         <PlayBackBar />
 
                     </div>
 
 
-                    <div className="border-2 flex-1 h-72  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
+                    <div className="bg-input/30 flex-1 h-72  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
 
 
                     </div>
@@ -189,3 +186,4 @@ const ablumArray = [
 
 
 const skeletonArray = [1,2,3,4]
+

@@ -19,10 +19,6 @@ function SongsRow({songs,playSongs,activeSong}:SongsData) {
 
     const {isPlaying} =useIsPlaying((state)=>state); 
  
-    
-
-
-
 
     return (
         <div className={`w-full h-14 sm:h-16 rounded-lg bg-input/30 flex items-center px-3 gap-3 ${activeSong == songs.id ? "bg-input/70":"bg-input/30"} `}>

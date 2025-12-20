@@ -17,10 +17,11 @@ function PlayBackBar() {
   const { isPlaying, setIsPlaying } = useIsPlaying((state) => state);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number>(0);
-  const [volume, setVolume] = useState<number>(0.5);
+  const [volume, setVolume] = useState<number>(1);
 
 
 
+  // Play new song
   useEffect(() => {
     if (!song) return;
 
@@ -48,7 +49,7 @@ function PlayBackBar() {
   }, [song, isPlayingCurrentSong])
 
 
-
+  // Getting current time of playing song
   useEffect(() => {
     if (!audioRef.current) return
 
@@ -72,11 +73,15 @@ function PlayBackBar() {
 
   }, [song])
 
+
+  // Updating volume 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
   }, [volume])
+
+
 
 
 
@@ -116,15 +121,16 @@ function PlayBackBar() {
     song ? (
       <>
 
-        <div className="  flex  gap-2 flex-1 h-[70%]">
+        <div className="  flex   gap-2 flex-1 h-[70%]">
 
 
-          <section className=" h-full flex-1/2">
-            <img className="w-96 h-48 object-cover rounded-full border-none" src={song?.image} alt="Non" />
+          <section className="  h-full flex-1/2">
+            <img className="w-96 h-48 object-cover rounded-xl border-none" src={song?.image} alt="Non" />
+
+
 
           </section>
-
-          <section className="h-full flex-1/2 p-4 flex flex-col justify-center gap-2 overflow-hidden">
+          <section className="h-full w-[260px] min-w-0 p-4 flex flex-col justify-center gap-2 overflow-hidden">
             <h1 className="text-2xl sm:text-3xl font-medium font-[cursive] truncate">
               {song?.name}
             </h1>
@@ -139,9 +145,9 @@ function PlayBackBar() {
 
             <div className="flex items-center gap-3 mt-2 text-sm text-white/50">
               <span>{((song?.duration || 0) / 60).toFixed(2)}</span>
-
             </div>
           </section>
+
 
 
         </div>
@@ -172,13 +178,20 @@ function PlayBackBar() {
 
             {/* Main controls */}
             <div className="flex items-center gap-5">
-              <Button variant={"default"}><ChevronFirst /></Button>
+              <Button
+                variant={"default"}
+                title="previous"
+              >
+                <ChevronFirst />
+              </Button>
               <Button
                 onClick={handlePlayPause}
-                variant={"default"}>
+                variant={"default"}
+                title="play/pause"
+              >
                 {isPlaying ? <Pause /> : <Play />}
               </Button>
-              <Button variant={"default"}><ChevronLast /></Button>
+              <Button title="next" variant={"default"}><ChevronLast /></Button>
             </div>
 
             {/* Right menu */}
@@ -186,9 +199,11 @@ function PlayBackBar() {
               <Input
                 type="range"
                 onChange={handleVolume}
-                defaultValue={0}
+                defaultValue={2}
                 max={2}
-                step={0.1} />
+                step={0.1}
+                title="volume" />
+
               <Volume2 size={40} />
 
             </div>
