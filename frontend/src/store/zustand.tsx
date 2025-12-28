@@ -17,6 +17,20 @@ type IsPlaying = {
     setIsPlaying: (value:boolean)=>void;
 }
 
+type UserData = {
+    name:string;
+    email:string;
+    token:string;
+}
+
+
+interface Authentication {
+    userData:UserData|null;
+    isLoggedIn:boolean;
+    setUserData:(data:UserData)=>void;
+    setIsLoggedIn:(data:boolean)=>void;
+}
+
 
 
 const useSongState = create<SongStore>((set) =>({
@@ -37,6 +51,14 @@ const useIsPlaying = create<IsPlaying>((set)=>({
 }))
 
 
+const useAuthentication= create<Authentication>((set)=>({
+    userData:null,
+    isLoggedIn:false,
+    setUserData:(data:UserData)=>set({userData:data}),
+    setIsLoggedIn:(data:boolean)=>set({isLoggedIn:data})
+}))
 
 
-export { useSongState,useHandleCurrentSong,useIsPlaying};
+
+
+export { useSongState,useHandleCurrentSong,useIsPlaying,useAuthentication};

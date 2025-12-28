@@ -12,15 +12,21 @@ const fetchUser = async (email) => {
     });
 };
 const authMiddleware = async (req, res, next) => {
+    console.log(req.headers);
     if (req.headers.authorization) {
         const extractToken = req.headers.authorization.replace("Bearer ", "");
         const verifyToken = Jwt.verifyToken(extractToken);
         //@ts-ignore
         const userData = await fetchUser(verifyToken.data);
-        if (userData)
-            res.locals = userData;
-        if (verifyToken)
-            next();
+        const response = {
+            token: null,
+            userData: {
+                email: userData?.email
+            }
+        };
+        if (verifyToken) {
+            res.status(200).json(response);
+        }
     }
     else {
         const userData = req.body;
@@ -31,9 +37,13 @@ const authMiddleware = async (req, res, next) => {
             const comparedPassw = await bcrypt.compare(userData.password, getUser.password);
             if (comparedPassw) {
                 const accessToken = Jwt.signToken(getUser.email, 120);
-                res.cookie("Access-Token", accessToken);
-                res.locals = getUser;
-                next();
+                const response = {
+                    token: accessToken,
+                    userData: {
+                        email: userData.email
+                    }
+                };
+                res.status(200).json(response);
             }
             else {
                 throw new CustomError("Password not matched", 401);

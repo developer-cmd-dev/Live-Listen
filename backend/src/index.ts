@@ -6,6 +6,7 @@ import ErrorMiddleware from './middleware/error.middleware.js';
 import express from 'express';
 import cookieParser from 'cookie-parser'
 import { redisClient } from './utility/RedisClient.js';
+import morgan from 'morgan';
 
 
 
@@ -26,9 +27,8 @@ client.$connect().then(() => {
         console.log("Redis is connected")
         app.listen(port, () => console.log("server is running on " + port));
 
-    }).catch((error: Error) => console.log(error.message))
-
-})
+    })
+}).catch((error:Error)=>console.log(error.message))
 
 app.use(route)
 app.use(ErrorMiddleware);

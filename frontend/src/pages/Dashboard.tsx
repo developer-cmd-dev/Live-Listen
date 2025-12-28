@@ -86,8 +86,7 @@ export default function Dashboard() {
         <div className="h-screen flex flex-col">
             {/* Header */}
 
-            <Navbar />
-            {/* Main */}
+                {/* Main */}
             <main className="flex-1 flex flex-col md:flex-col lg:flex-row gap-4 justify-center overflow-hidden p-3 ">
                 <div className="w-full lg:flex-[2] h-full rounded-md overflow-auto bg-input/10 p-4 sm:p-5 space-y-6">
 

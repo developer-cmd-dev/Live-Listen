@@ -12,7 +12,7 @@ const route = Router();
 
 
 route.post("/signup",createUser);
-route.get("/login",authMiddleware,login);
+route.post("/login",authMiddleware,login);
 route.get("/",dashboard);
 route.get("/search/:name",searchController);
 route.post("/create-playlist",authMiddleware,createPlaylist);
