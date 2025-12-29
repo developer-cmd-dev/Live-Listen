@@ -25,10 +25,19 @@ const createUser = async (req, res) => {
                 password: hashedPassword
             }
         });
+        const accessToken = Jwt.createAccessToken(response.email);
+        const refreshToken = Jwt.createRefreshToken(response.email);
+        const refreshTokenPayload = await prisma.refreshToken.create({
+            data: {
+                token: refreshToken,
+                userEmail: response.email
+            }
+        });
         const responseObj = {
             id: response.id,
             email: response.email,
-            name: response.name
+            name: response.name,
+            accessToken: accessToken
         };
         res.status(200).json(responseObj);
     }

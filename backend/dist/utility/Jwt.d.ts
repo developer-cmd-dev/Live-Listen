@@ -2,7 +2,8 @@ import pkg from 'jsonwebtoken';
 declare class Jwt {
     private secret;
     constructor(secret: string);
-    signToken(data: string, expirey: number): string;
+    createRefreshToken(data: string): string;
+    createAccessToken(data: string): string;
     verifyToken(token: string): string | pkg.JwtPayload;
 }
 declare const _default: Jwt;

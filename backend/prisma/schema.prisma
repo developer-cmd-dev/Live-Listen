@@ -23,6 +23,7 @@ model User{
   name      String?
   playlist  Playlist[]
   rooms     Rooms?
+  refreshToken RefreshToken?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -105,4 +106,14 @@ model Rooms{
   userId      Int @unique
   user        User @relation(fields: [userId],references: [id])
   createdAt       DateTime  @default(now())
+}
+
+
+model RefreshToken {
+  id          Int @id @default(autoincrement())
+  token        String @unique
+  userEmail      String @unique
+  user        User @relation(fields: [userEmail],references: [email])
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 }

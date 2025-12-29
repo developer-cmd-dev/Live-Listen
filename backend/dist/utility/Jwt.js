@@ -8,10 +8,15 @@ class Jwt {
     constructor(secret) {
         this.secret = secret;
     }
-    signToken(data, expirey) {
+    createRefreshToken(data) {
         return sign({
             data: data
-        }, this.secret, { expiresIn: expirey * expirey });
+        }, this.secret, { expiresIn: '30d' });
+    }
+    createAccessToken(data) {
+        return sign({
+            data: data
+        }, this.secret, { expiresIn: '1h' });
     }
     verifyToken(token) {
         try {
