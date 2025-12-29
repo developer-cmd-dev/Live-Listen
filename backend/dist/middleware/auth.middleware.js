@@ -10,8 +10,10 @@ const authMiddleware = async (req, res, next) => {
             const tokenPayload = req.headers.authorization;
             const extractToken = tokenPayload.replace("Bearer ", "");
             const userPayload = Jwt.verifyToken(extractToken);
-            const getRefreshToken = await prisma.refreshToken.findUnique({ where: { userEmail: userPayload.data } });
-            console.log(getRefreshToken?.token);
+            const refreshToken = await prisma.refreshToken.findUnique({ where: { userEmail: userPayload.data } });
+            if (refreshToken) {
+                const verifyRefreshToken = Jwt.verifyToken(refreshToken?.token);
+            }
             res.status(200).json(true);
         }
     }
