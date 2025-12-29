@@ -15,13 +15,54 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useState, type ChangeEvent, type FormEvent } from "react"
+import { Eye, EyeClosed, EyeOff } from "lucide-react"
 
-export function SignUpForm ({
+type Props = {
+  className: string;
+  handleSubmit: (data: UserSignupData | null) => void;
+}
+
+export function SignUpForm({
   className,
-  ...props
-}: React.ComponentProps<"div">) {
+  handleSubmit
+}: Props) {
+
+
+  const [data, setData] = useState<UserSignupData>({
+    name: "",
+    email: "",
+    password: ""
+  })
+
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [isConfirmPassword,setIsConfirmPassword]=useState(true);
+
+
+
+  const handleData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setData((prev) => ({
+      ...prev,
+      [name]: value
+    }))
+  }
+
+  const handleConfirmPassword = (e:React.ChangeEvent<HTMLInputElement>)=>{
+      const password = data.password;
+      if(!password.includes(e.target.value))setIsConfirmPassword(false);
+      else setIsConfirmPassword(true);
+  }
+
+
+
+
+
+
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} >
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back Live Listen</CardTitle>
@@ -30,7 +71,10 @@ export function SignUpForm ({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={(e:FormEvent<HTMLFormElement>)=>{
+            e.preventDefault();
+            handleSubmit(data);
+          }}>
             <FieldGroup>
               <Field>
 
@@ -54,8 +98,10 @@ export function SignUpForm ({
                 <Input
                   id="name"
                   type="text"
+                  name="name"
                   placeholder="Jhon Doe"
                   required
+                  onChange={handleData}
                 />
               </Field>
 
@@ -64,27 +110,44 @@ export function SignUpForm ({
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   placeholder="m@example.com"
+                  onChange={handleData}
                   required
                 />
               </Field>
               <Field>
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
-                  <a
-                    href="#"
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </a>
                 </div>
-                <Input id="password" type="password" required />
+                <div className=" flex items-center justify-around">
+                  <Input name="password" id="password" type={showPassword?"text":"password"} required onChange={handleData} />
+                  <Button variant={"ghost"} type="button" className="ml-3 cursor-pointer" onClick={()=>setShowPassword(prev=>!prev)} >
+                    {showPassword ? <EyeOff  /> : <Eye />}
+                  </Button>
+                </div>
+
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
-                <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
-                </FieldDescription>
+                <div className="flex items-center">
+                  <FieldLabel htmlFor="password">Confirm Password</FieldLabel>
+                </div>
+                <div className=" flex items-center justify-around">
+                  <Input  
+                  name="confirm-password" 
+                  id="confirm-password" 
+                  type={showPassword?"text":"password"} 
+                  required 
+                  style={{
+                    borderColor:isConfirmPassword ? "border-input":"red",
+                  }}
+                  onChange={handleConfirmPassword}
+                  />
+ 
+                </div>
+              </Field>
+              <Field>
+                <Button type="submit">Signup</Button>
               </Field>
             </FieldGroup>
           </form>
@@ -96,4 +159,11 @@ export function SignUpForm ({
       </FieldDescription>
     </div>
   )
+}
+
+
+export interface UserSignupData {
+  name: string;
+  email: string;
+  password: string;
 }
