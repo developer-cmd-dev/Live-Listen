@@ -6,24 +6,30 @@ import { RouterProvider } from 'react-router';
 import Dashboard from './pages/Dashboard.tsx';
 import Login from './pages/Login.tsx';
 import { Toaster } from 'sonner';
+import Landing from './pages/Landing.tsx';
 
 
 
 const router = createBrowserRouter([
+  
     {
         path:"/",
-        element:<App/>,
+         element:<App/>,
         children:[
             {
                 path:"/",
+                element:<Landing/>
+            },
+            {
+                path:"/dashboard",
                 element:<Dashboard/>
             },
             {
-                path:"login",
+                path:"/login",
                 element:<Login/>
             }
         ]
-    }   
+    }
 ])
 
 

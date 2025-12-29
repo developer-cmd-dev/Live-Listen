@@ -43,7 +43,6 @@ function App() {
 
       <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
         <Toaster theme='light' position={"top-center"} closeButton={true} />
-        <Navbar />
         <Outlet />
       </ThemeProvider>
     </>

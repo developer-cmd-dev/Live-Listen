@@ -85,6 +85,7 @@ export default function Dashboard() {
     return (
         <div className="h-screen flex flex-col">
             {/* Header */}
+        <Navbar />
 
                 {/* Main */}
             <main className="flex-1 flex flex-col md:flex-col lg:flex-row gap-4 justify-center overflow-hidden p-3 ">
