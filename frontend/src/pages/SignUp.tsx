@@ -1,23 +1,28 @@
 
 import { SignUpForm, type UserSignupData } from '@/components/signup-form'
-import axios from 'axios'
+import { useAuthentication } from '@/store/zustand';
+import axios, { AxiosError } from 'axios'
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 function SignUp() {
 
   const navigate = useNavigate();
+  const {setIsLoggedIn,setUserData}=useAuthentication((state)=>state);
 
   const handleSubmit =async (data:UserSignupData|null)=>{
     try {
       
       const response = await axios.post("http://localhost:3000/signup",data);
-      console.log(response.data)
-      navigate("/dashboard")
+      setUserData(response.data);
+      setIsLoggedIn(true);
       toast.success("User Registered")
+      navigate("/dashboard")
 
-    } catch (error) {
-      console.log(error)
+    } catch (error:AxiosError|unknown) {
+      if(error instanceof AxiosError){
+        toast.error(error.response?.data.message);
+      }
       
     }
   }
@@ -25,7 +30,6 @@ function SignUp() {
 
   return (
     <div className="min-h-screen flex items-center justify-center w-full bg-[#020617] relative">
-      {/* Orange Radial Glow Background */}
       <div
         className="absolute inset-0 z-0"
         style={{

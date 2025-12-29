@@ -64,7 +64,7 @@ console.log(req.headers)
         if (getUser) {
             const comparedPassw = await bcrypt.compare(userData.password, getUser.password);
             if (comparedPassw) {
-                const accessToken = Jwt.signToken(getUser.email,120);
+                const accessToken = Jwt.createAccessToken(getUser.email);
                 const response:ClientResponse={
                     token:accessToken,
                     userData:{

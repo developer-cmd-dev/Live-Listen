@@ -13,10 +13,16 @@ class Jwt{
         this.secret=secret;
     }
 
-    signToken(data:string,expirey:number) {
+    createRefreshToken(data:string) {
       return sign({
             data:data
-        },this.secret,{expiresIn:expirey*expirey})
+        },this.secret,{expiresIn:'30d'})
+    }
+
+    createAccessToken(data:string){
+        return sign({
+            data:data
+        },this.secret,{expiresIn:'1h'})
     }
 
     verifyToken(token:string){

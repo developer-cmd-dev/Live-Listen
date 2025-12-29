@@ -25,10 +25,15 @@ const createUser = async (req, res) => {
                 password: hashedPassword
             }
         });
-        res.status(200).json("User signed up");
+        const responseObj = {
+            id: response.id,
+            email: response.email,
+            name: response.name
+        };
+        res.status(200).json(responseObj);
     }
     catch (error) {
-        throw new CustomError("Something went wrong", 500);
+        throw new CustomError("User already exist", 409);
     }
 };
 const login = async (req, res) => {

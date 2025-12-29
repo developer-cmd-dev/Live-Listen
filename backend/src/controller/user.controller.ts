@@ -6,44 +6,55 @@ import bcrypt from 'bcrypt';
 import Jwt from '../utility/Jwt.js';
 
 
+
 const prisma = new PrismaClient();
 
 
-const createUser = async(req:Request,res:Response)=>{
-    const userSchema = z.object({
-        email:z.email("Incorrect Email"),
-        name:z.string("Incorrect Name formate"),
-        password:z.string("Icorrect Password formate"),
+const createUser = async (req: Request, res: Response) => {
+  const userSchema = z.object({
+    email: z.email("Incorrect Email"),
+    name: z.string("Incorrect Name formate"),
+    password: z.string("Icorrect Password formate"),
+  })
+
+
+  const userData = req.body;
+  const result = userSchema.safeParse(userData);
+  if (result.error) {
+    throw new CustomError(result.error.message, 404);
+  }
+  try {
+    const { email, name, password } = result.data;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const response = await prisma.user.create({
+      data: {
+        email: email,
+        name: name,
+        password: hashedPassword
+      }
     })
 
-  
-      const userData = req.body;
-    const result = userSchema.safeParse(userData);
-    if(result.error){
-        throw new CustomError(result.error.message,404);
+    const accessToken =  Jwt.createAccessToken(response.email);
+    const refreshToken = Jwt.createRefreshToken(response.email)
+    const responseObj = {
+      id:response.id,
+      email:response.email,
+      name:response.name,
+      accessToken:accessToken
     }
-    try {
-    const {email,name,password}=result.data;
-    const hashedPassword =await bcrypt.hash(password,10);
-
-   const response = await prisma.user.create({
-    data:{
-        email:email,
-        name:name,
-        password:hashedPassword
-    }
-   })
-    res.status(200).json("User signed up")
-  } catch (error) {
-    throw new CustomError("Something went wrong",500);
-  }
     
+    res.status(200).json(responseObj)
+  } catch (error) {
+    throw new CustomError("User already exist", 409);
+  }
+
 }
 
 
-const login = async(req:Request,res:Response)=>{
+const login = async (req: Request, res: Response) => {
   res.status(200).json("User Logged in successfully");
 }
 
 
-export {createUser,login}
+export { createUser, login }
