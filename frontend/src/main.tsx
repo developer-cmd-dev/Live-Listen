@@ -7,6 +7,7 @@ import Dashboard from './pages/Dashboard.tsx';
 import Login from './pages/Login.tsx';
 import { Toaster } from 'sonner';
 import Landing from './pages/Landing.tsx';
+import SignUp from './pages/SignUp.tsx';
 
 
 
@@ -27,7 +28,11 @@ const router = createBrowserRouter([
             {
                 path:"/login",
                 element:<Login/>
-            }
+            },
+            {
+                path:"/signup",
+                element:<SignUp/>
+            },
         ]
     }
 ])

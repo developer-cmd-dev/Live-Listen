@@ -1,9 +1,8 @@
-import React from 'react'
-import { GalleryVerticalEnd } from 'lucide-react'
-import { LoginForm } from '@/components/login-form'
-function Login() {
-  return (
 
+import { SignUpForm } from '@/components/signup-form'
+
+function SignUp() {
+  return (
     <div className="min-h-screen flex items-center justify-center w-full bg-[#020617] relative">
       {/* Orange Radial Glow Background */}
       <div
@@ -15,15 +14,11 @@ function Login() {
 
 
       <div className=' z-10 w-sm'>
-        <LoginForm className='border-none' />
+        <SignUpForm className='border-none' />
 
       </div>
     </div>
-
-
-
-
   )
 }
 
-export default Login
+export default SignUp

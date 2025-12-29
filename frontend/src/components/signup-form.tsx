@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 
-export function LoginForm({
+export function SignUpForm ({
   className,
   ...props
 }: React.ComponentProps<"div">) {
@@ -26,14 +26,14 @@ export function LoginForm({
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back Live Listen</CardTitle>
           <CardDescription>
-            Login with your Google account
+            Signup with your Google account
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form>
             <FieldGroup>
               <Field>
-          
+
                 <Button variant="outline" type="button">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -41,12 +41,24 @@ export function LoginForm({
                       fill="currentColor"
                     />
                   </svg>
-                  Login with Google
+                  Signup with Google
                 </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
+
               </FieldSeparator>
+
+              <Field>
+                <FieldLabel htmlFor="email">Name</FieldLabel>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="Jhon Doe"
+                  required
+                />
+              </Field>
+
               <Field>
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
