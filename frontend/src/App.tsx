@@ -2,9 +2,10 @@
 import { Outlet, useNavigate } from 'react-router'
 import { ThemeProvider } from './components/theme-provider'
 import { toast, Toaster } from 'sonner'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useAuthentication } from './store/zustand'
+import Loading from './components/loading'
 
 
 
@@ -12,6 +13,7 @@ function App() {
   const url = import.meta.env.VITE_BACKEND_URL;
   const navigate = useNavigate();
   const { setIsLoggedIn, setUserData } = useAuthentication((state) => state)
+  const [loading, setIsLoading] = useState(false);
 
   useEffect(() => {
 
@@ -20,17 +22,16 @@ function App() {
       try {
         const accessToken = localStorage.getItem("access-token");
         if (accessToken) {
-          const response = await axios.post(`${url}/auth/login`, null, { headers: { Authorization: `Bearer ${accessToken}` } })
-          console.log(response.data)
-          setUserData(response.data)
-          navigate("/dashboard")
-          setIsLoggedIn(true)
+          loginUsingAccessToken(accessToken);
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response?.status === 401) {
+            setIsLoading(true);
             axios.post(`${url}/auth/refresh`, null, { withCredentials: true })
-              .then((response) => console.log(response.data))
+              .then((response) => {
+                loginUsingAccessToken(response.data);
+              })
               .catch((error) => {
                 if (axios.isAxiosError(error)) {
                   if (error.response?.status === 401) {
@@ -50,12 +51,23 @@ function App() {
   }, [])
 
 
+  const loginUsingAccessToken = async (accessToken: string) => {
+    setIsLoading(true)
+
+    const response = await axios.post(`${url}/auth/login`, null, { headers: { Authorization: `Bearer ${accessToken}` } })
+    setUserData(response.data)
+    setIsLoading(false)
+    navigate("/dashboard")
+    setIsLoggedIn(true)
+  }
+
+
   return (
     <>
 
       <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
         <Toaster theme='light' position={"top-center"} closeButton={true} />
-        <Outlet />
+        {loading ? <Loading/>:<Outlet />}
       </ThemeProvider>
     </>
   )
