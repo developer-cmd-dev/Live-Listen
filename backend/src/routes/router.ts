@@ -7,13 +7,14 @@ import { dashboard } from "../controller/dashboard.controller.js";
 import { searchController } from "../controller/search.controller.js";
 import { addSong, createPlaylist, deletePlaylist, updatePlaylist } from "../controller/playlist.controller.js";
 import { startJam } from "../controller/jamming.controller.js";
+import { refreshToken } from "../controller/authentication.controller.js";
 const route = Router();
 
 
 
 route.post("/auth/signup",createUser);
 route.post("/auth/login",authMiddleware,login);
-route.post("/auth/refresh")
+route.post("/auth/refresh",refreshToken)
 route.get("/",dashboard);
 route.get("/search/:name",searchController);
 route.post("/create-playlist",authMiddleware,createPlaylist);

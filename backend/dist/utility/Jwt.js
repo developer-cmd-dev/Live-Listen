@@ -15,7 +15,7 @@ class Jwt {
     createAccessToken(data) {
         return sign({
             data: data
-        }, this.secret, { expiresIn: '1h' });
+        }, this.secret, { expiresIn: '5m' });
     }
     verifyToken(token) {
         return verify(token, this.secret);

@@ -20,51 +20,50 @@ type UserJwtPayload = {
 }
 
 type UserData = {
-    email:string;
-    password:string;
-    playlist:object
-} 
+    email: string;
+    password: string;
+    playlist: object
+}
 
 
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (req.headers.authorization) {
-        const tokenPayload = req.headers.authorization;
-        const accessToken = tokenPayload.replace("Bearer ", "");
-        const userPayload = Jwt.verifyToken(accessToken) as UserJwtPayload;
-        res.status(200).json({message:"User signed in",success:true})
+            const tokenPayload = req.headers.authorization;
+            const accessToken = tokenPayload.replace("Bearer ", "");
+            const userPayload = Jwt.verifyToken(accessToken) as UserJwtPayload;
+            
+            res.status(200).json({ message: "User signed in", success: true })
 
-    }else{
+        } else {
 
-        const {email,password}=req.body;
-        const userData =await prisma.user.findUnique({where:{email:email},include:{playlist:true}}) as UserData;
-        const comparePassword =await bcrypt.compare(password,userData?.password);
-        if(!comparePassword) throw new CustomError("Invalid Password",401);
+            const { email, password } = req.body;
+            const userData = await prisma.user.findUnique({ where: { email: email }, include: { playlist: true } }) as UserData;
+            if(userData == null) res.status(404).send("User not found")
+            const comparePassword = await bcrypt.compare(password, userData?.password);
+            if (!comparePassword)res.status(401).send("Invalid password")
 
-        const accessToken = Jwt.createAccessToken(email);
-        const refreshToken = Jwt.createRefreshToken(email);
+            const accessToken = Jwt.createAccessToken(email);
+            const refreshToken = Jwt.createRefreshToken(email);
 
-        const response = {
-            message:"Success",
-            data:{
-                userData:{
-                    email:userData.email,
-                    playlist:userData.playlist
-                },
-                accessToken:accessToken
+            const response = {
+                message: "Success",
+                data: {
+                    userData: {
+                        email: userData.email,
+                        playlist: userData.playlist
+                    },
+                    accessToken: accessToken
+                }
             }
+
+            res.cookie("refresh-token", refreshToken, { httpOnly: true, secure: false, sameSite: "lax" });
+            res.status(200).json(response);
+
+
         }
-
-        res.cookie("refresh-token",refreshToken,{httpOnly:true,secure:false,sameSite:"lax"});
-        console.log(res.cookie)
-        res.status(200).json(response);
-
-        
-    }
     } catch (error) {
-        if(error instanceof CustomError){
-            res.status(error.statuscode).json(error.message);
-        }
+      console.log(error)
     }
 
 }

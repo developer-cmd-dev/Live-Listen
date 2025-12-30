@@ -22,7 +22,7 @@ class Jwt{
     createAccessToken(data:string){
         return sign({
             data:data
-        },this.secret,{expiresIn:'1h'})
+        },this.secret,{expiresIn:'5m'})
     }
 
     verifyToken(token:string){

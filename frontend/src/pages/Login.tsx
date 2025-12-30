@@ -7,20 +7,23 @@ function Login() {
 
   const navigate = useNavigate()
   const {setIsLoggedIn,setUserData}=useAuthentication((state)=>state)
+  const url = import.meta.env.VITE_BACKEND_URL;
+
 
 
 
   const handleSubmit = async (formData:FormData)=>{
-
     try {
-      const response =await axios.post("http://localhost:3000/login",formData,{withCredentials:true})
+      const response =await axios.post(`${url}/auth/login`,formData,{withCredentials:true})
       setIsLoggedIn(true);
       setUserData(response.data)
       navigate("/dashboard")
       toast.success("Login Success")
     } catch (error) {
-      if(error instanceof AxiosError){
-        toast.error(error.response?.data.message)
+      if(axios.isAxiosError(error)){
+        toast.error(error.response?.data)
+      }else{
+        console.log(error)
       }
     }
   }

@@ -9,19 +9,19 @@ function SignUp() {
 
   const navigate = useNavigate();
   const {setIsLoggedIn,setUserData}=useAuthentication((state)=>state);
-
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const handleSubmit =async (data:UserSignupData|null)=>{
     try {
       
-      const response = await axios.post("http://localhost:3000/signup",data);
+      const response = await axios.post(`${backendUrl}/auth/signup`,data);
       setUserData(response.data);
       setIsLoggedIn(true);
       toast.success("User Registered")
-      navigate("/dashboard")
+      navigate("/login")
 
     } catch (error:AxiosError|unknown) {
       if(error instanceof AxiosError){
-        toast.error(error.response?.data.message);
+        toast.error(error.response?.data);
       }
       
     }
