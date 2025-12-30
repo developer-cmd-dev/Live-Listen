@@ -10,11 +10,22 @@ function Login() {
   const url = import.meta.env.VITE_BACKEND_URL;
 
 
+  type LoginResponse = {
+    userData:{
+      id:number;
+      name:string;
+      email:string;
+      playlist:[]
+    };
+    accessToken:string;
+  }
 
 
   const handleSubmit = async (formData:FormData)=>{
     try {
       const response =await axios.post(`${url}/auth/login`,formData,{withCredentials:true})
+      const payload:LoginResponse = response.data;
+      localStorage.setItem("access-token",payload.accessToken);
       setIsLoggedIn(true);
       setUserData(response.data)
       navigate("/dashboard")

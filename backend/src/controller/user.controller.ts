@@ -34,7 +34,7 @@ const createUser = async (req: Request, res: Response) => {
         password: hashedPassword
       }
     })
-    if(response)res.status(200).json({message:"User signed up ",success:true});
+    if (response) res.status(200).json({ message: "User signed up ", success: true });
   } catch (error) {
     throw new CustomError("User already exist", 409);
   }
@@ -43,7 +43,19 @@ const createUser = async (req: Request, res: Response) => {
 
 
 const login = async (req: Request, res: Response) => {
-  res.status(200).json("User Logged in successfully");
+
+  try {
+    const email = res.locals.userPayload;
+    const findUser = await prisma.user.findUnique({
+      where: { email: email },
+      select: {id:true,name:true, email: true, playlist: true }
+    });
+
+    res.status(200).json(findUser)
+  } catch (error) {
+    throw new CustomError("Internal Server Error",500);
+  }
+
 }
 
 

@@ -1,7 +1,7 @@
 import pkg from 'jsonwebtoken'
 
 const  { JsonWebTokenError, TokenExpiredError,verify,sign } =pkg
-
+import { CustomError } from '../error/ErrorHandler.js';
 import {config} from 'dotenv'
 config();
 
@@ -16,18 +16,29 @@ class Jwt{
     createRefreshToken(data:string) {
       return sign({
             data:data
-        },this.secret,{expiresIn:'30d'})
+        },this.secret,{expiresIn:'5m'})
     }
 
     createAccessToken(data:string){
         return sign({
             data:data
-        },this.secret,{expiresIn:'5m'})
+        },this.secret,{expiresIn:'30d'})
     }
 
     verifyToken(token:string){
+        try{
            return verify(token,this.secret);
-      
+        }catch(error){
+            if(error instanceof TokenExpiredError){
+                throw new CustomError("Token expired",401);
+            }else if(error instanceof JsonWebTokenError){
+                throw new CustomError(error.message,401);
+            }else{
+                throw new CustomError("Something went wrong",401);
+            }
+
+           
+        }
     }
 
 

@@ -33,7 +33,17 @@ const createUser = async (req, res) => {
     }
 };
 const login = async (req, res) => {
-    res.status(200).json("User Logged in successfully");
+    try {
+        const email = res.locals.userPayload;
+        const findUser = await prisma.user.findUnique({
+            where: { email: email },
+            select: { id: true, name: true, email: true, playlist: true }
+        });
+        res.status(200).json(findUser);
+    }
+    catch (error) {
+        throw new CustomError("Internal Server Error", 500);
+    }
 };
 export { createUser, login };
 //# sourceMappingURL=user.controller.js.map

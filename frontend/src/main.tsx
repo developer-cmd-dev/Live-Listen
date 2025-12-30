@@ -8,6 +8,7 @@ import Login from './pages/Login.tsx';
 import { Toaster } from 'sonner';
 import Landing from './pages/Landing.tsx';
 import SignUp from './pages/SignUp.tsx';
+import ProtectedRoute from './components/ProtectedRoute.tsx';
 
 
 
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
             },
             {
                 path:"/dashboard",
-                element:<Dashboard/>
+                element:<ProtectedRoute><Dashboard/></ProtectedRoute>
             },
             {
                 path:"/login",

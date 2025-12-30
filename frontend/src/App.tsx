@@ -1,42 +1,54 @@
 
-import { Outlet } from 'react-router'
+import { Outlet, useNavigate } from 'react-router'
 import { ThemeProvider } from './components/theme-provider'
 import { toast, Toaster } from 'sonner'
-import Navbar from './components/Navbar'
 import { useEffect } from 'react'
-import { useAuthentication } from './store/zustand'
 import axios from 'axios'
+import { useAuthentication } from './store/zustand'
 
 
 
 function App() {
-
-  const { userData, isLoggedIn, setIsLoggedIn, setUserData } = useAuthentication((state) => state);
+  const url = import.meta.env.VITE_BACKEND_URL;
+  const navigate = useNavigate();
+  const { setIsLoggedIn, setUserData } = useAuthentication((state) => state)
 
   useEffect(() => {
-    const basicAuthentication = async () => {
-      const token = sessionStorage.getItem('Access-Token');
 
+    const handleAuthentication = async () => {
 
       try {
-        if (token) {
-          const response = await axios.post("http://localhost:3000/login", null, {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          })
+        const accessToken = localStorage.getItem("access-token");
+        if (accessToken) {
+          const response = await axios.post(`${url}/auth/login`, null, { headers: { Authorization: `Bearer ${accessToken}` } })
           console.log(response.data)
-          setIsLoggedIn(true);
-          setUserData(response.data);
-        } 
+          setUserData(response.data)
+          navigate("/dashboard")
+          setIsLoggedIn(true)
+        }
       } catch (error) {
-        toast.error("Invalid Token");
+        if (axios.isAxiosError(error)) {
+          if (error.response?.status === 401) {
+            axios.post(`${url}/auth/refresh`, null, { withCredentials: true })
+              .then((response) => console.log(response.data))
+              .catch((error) => {
+                if (axios.isAxiosError(error)) {
+                  if (error.response?.status === 401) {
+                    toast.error("Your Session has expired. Login Again")
+                  }
+                }
+              })
+
+          }
+        }
       }
+
     }
 
-    basicAuthentication()
+    handleAuthentication()
 
   }, [])
+
 
   return (
     <>

@@ -3,14 +3,17 @@ import LandingNavBar from '@/components/LandingNavBar'
 import { LayoutTextFlip } from '@/components/ui/layout-text-flip'
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect'
 import { HoverBorderGradient } from '@/components/ui/hover-border-gradient'
-
-
-import { useState } from 'react'
 import { Music } from 'lucide-react'
-import { Button } from '@/components/ui/button'
 import { Link } from 'react-router'
 
+
 function Landing() {
+
+
+
+
+
+
 
   return (
     <div className="min-h-screen w-full bg-[#020617] relative overflow-hidden">
