@@ -10,7 +10,10 @@ import morgan from 'morgan';
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 const client = new PrismaClient();
-app.use(cors());
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());

@@ -1,10 +1,10 @@
 import type { NextFunction, Request, Response } from "express";
 import { Prisma, PrismaClient } from "@prisma/client";
-import { email, jwt } from "zod";
+import { email, jwt, success } from "zod";
 import bcrypt from 'bcrypt'
 import { CustomError } from "../error/ErrorHandler.js";
 import Jwt from "../utility/Jwt.js";
-import type {  JwtPayload } from "jsonwebtoken";
+import type { JwtPayload } from "jsonwebtoken";
 
 const prisma = new PrismaClient();
 
@@ -14,90 +14,59 @@ const prisma = new PrismaClient();
 
 
 
-// const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
-//     if (req.headers.authorization) {
-//         const extractToken = req.headers.authorization.replace("Bearer ", "")
-//         const verifyToken = Jwt.verifyToken(extractToken);
-
-//         //@ts-ignore
-//         const userData = await fetchUser(verifyToken.data);
-
-//         if(userData){
-//         const refreshToken =await prisma.refreshToken.findFirst({where:{userId:userData?.id},select:refreshTokenSelect});
-//         if(refreshToken){
-
-//         }
-//         const verifyRefreshToken = Jwt.verifyToken()
-
-//         }
-
-//         const response:ClientResponse={
-//             token:null,
-//             userData:{
-//                 email:userData?.email
-//             }
-//         }
-
-//         if(verifyToken){
-//             res.status(200).json(response);
-//         }
-
-//     } else {
-//         const userData = req.body;
-//         if(!userData) throw new CustomError("Empty User field",404);
-//         const getUser =await fetchUser(userData.email);
-
-//         if (getUser) {
-//             const comparedPassw = await bcrypt.compare(userData.password, getUser.password);
-//             if (comparedPassw) {
-//                 const accessToken = Jwt.createAccessToken(getUser.email);
-//                 const response:ClientResponse={
-//                     token:accessToken,
-//                     userData:{
-//                         email:userData.email
-//                     }
-//                 }
-//                 res.status(200).json(response)
-//             } else {
-//                 throw new CustomError("Password not matched", 401)
-//             }
-
-//         } else {
-//             throw new CustomError("User not found", 404)
-//         }
-//     }
-
-
-
-
-// }
 
 type UserJwtPayload = {
-    data:string;
+    data: string;
 }
 
+type UserData = {
+    email:string;
+    password:string;
+    playlist:object
+} 
 
 
 const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
         if (req.headers.authorization) {
-            const tokenPayload = req.headers.authorization;
-            const extractToken = tokenPayload.replace("Bearer ", "");
+        const tokenPayload = req.headers.authorization;
+        const accessToken = tokenPayload.replace("Bearer ", "");
+        const userPayload = Jwt.verifyToken(accessToken) as UserJwtPayload;
+        res.status(200).json({message:"User signed in",success:true})
 
-            const userPayload= Jwt.verifyToken(extractToken)as UserJwtPayload;
-            const refreshToken = await prisma.refreshToken.findUnique({where:{userEmail:userPayload.data}});
+    }else{
 
-            if(refreshToken){
-                const verifyRefreshToken = Jwt.verifyToken(refreshToken?.token);
+        const {email,password}=req.body;
+        const userData =await prisma.user.findUnique({where:{email:email},include:{playlist:true}}) as UserData;
+        const comparePassword =await bcrypt.compare(password,userData?.password);
+        if(!comparePassword) throw new CustomError("Invalid Password",401);
+
+        const accessToken = Jwt.createAccessToken(email);
+        const refreshToken = Jwt.createRefreshToken(email);
+
+        const response = {
+            message:"Success",
+            data:{
+                userData:{
+                    email:userData.email,
+                    playlist:userData.playlist
+                },
+                accessToken:accessToken
             }
-
-            res.status(200).json(true)
-
         }
-    } catch (error) {
-        console.log(error)
-        res.status(400).json(false)
+
+        res.cookie("refresh-token",refreshToken,{httpOnly:true,secure:false,sameSite:"lax"});
+        console.log(res.cookie)
+        res.status(200).json(response);
+
+        
     }
+    } catch (error) {
+        if(error instanceof CustomError){
+            res.status(error.statuscode).json(error.message);
+        }
+    }
+
 }
 
 

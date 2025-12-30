@@ -15,13 +15,43 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
+import { useState, type ChangeEvent } from "react"
+
+
+interface Props{
+  className:string;
+  handleSubmit:(formData:FormData)=>void;
+}
+export interface FormData{
+  email:string;
+  password:string;
+}
 
 export function LoginForm({
   className,
-  ...props
-}: React.ComponentProps<"div">) {
+  handleSubmit
+}: Props) {
+
+
+
+  const [formData,setFormData]=useState<FormData>({
+    email:"",
+    password:""
+  })
+
+
+  const handleFormData = (e:ChangeEvent<HTMLInputElement>)=>{
+    const {name,value}=e.target;
+    setFormData((prev)=>({
+      ...prev,
+      [name]:value
+    }))
+  }
+
+
+
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} >
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back Live Listen</CardTitle>
@@ -30,7 +60,10 @@ export function LoginForm({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form>
+          <form onSubmit={(e)=>{
+            e.preventDefault()
+            handleSubmit(formData)
+          }}>
             <FieldGroup>
               <Field>
           
@@ -52,6 +85,8 @@ export function LoginForm({
                 <Input
                   id="email"
                   type="email"
+                  name="email"
+                  onChange={handleFormData}
                   placeholder="m@example.com"
                   required
                 />
@@ -66,7 +101,7 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" onChange={handleFormData} type="password" required />
               </Field>
               <Field>
                 <Button type="submit">Login</Button>
