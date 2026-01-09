@@ -63,7 +63,11 @@ function Login() {
         toast.message("Access Denied")
       }
     } catch (error) {
-  
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data)
+      } else {
+        console.log(error)
+      }
     }
   }
 
