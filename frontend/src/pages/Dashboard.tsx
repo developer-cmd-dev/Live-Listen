@@ -7,7 +7,11 @@ import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
 import { useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
 import Navbar from "@/components/Navbar"
-import { RoomAccess } from "@/components/RoomAccess"
+import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
+import Chat from "@/components/Chat"
+import { motion } from 'motion/react'
+
+
 export default function Dashboard() {
 
     const [songs, setSongs] = useState<Songs[]>([])
@@ -36,6 +40,11 @@ export default function Dashboard() {
     const setIsPlayCurrentSong = useHandleCurrentSong((state) => state.setIsPlayCurrentSong)
     const { isPlaying, setIsPlaying } = useIsPlaying((state) => state);
 
+    const [isRoomCreated, setIsRoomCreated] = useState(false);
+
+
+
+
 
     const playSong = (id: number, songData: Songs) => {
         setActiveSong(id);
@@ -56,7 +65,7 @@ export default function Dashboard() {
     }
 
     const previousSong = () => {
-        if (activeSong && activeSong >  0) {
+        if (activeSong && activeSong > 0) {
             setActiveSong(activeSong - 1)
             handlePrevNext()
 
@@ -65,13 +74,15 @@ export default function Dashboard() {
     }
 
     const handlePrevNext = () => {
-          if(activeSong){
-              setSong(songs[activeSong]);
+        if (activeSong) {
+            setSong(songs[activeSong]);
             setIsPlayCurrentSong(true);
             localStorage.setItem("last-played-song", JSON.stringify(songs[activeSong]))
-          }
+        }
     }
 
+
+    const handleRoomCreate = () => setIsRoomCreated((prev) => !prev);
 
 
 
@@ -79,9 +90,9 @@ export default function Dashboard() {
     return (
         <div className="h-screen flex flex-col">
             {/* Header */}
-        <Navbar />
+            <Navbar />
 
-                {/* Main */}
+            {/* Main */}
             <main className="flex-1 flex flex-col md:flex-col lg:flex-row gap-4 justify-center overflow-hidden p-3 ">
                 <div className="w-full lg:flex-[2] h-full rounded-md overflow-auto bg-input/10 p-4 sm:p-5 space-y-6">
 
@@ -130,15 +141,20 @@ export default function Dashboard() {
 
 
                 <div className="w-full  lg:flex-1 h-full rounded-xl  bg-none flex flex-col gap-4 ">
+                    {
+                        !isRoomCreated && <div className="bg-input/30  flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
+                            <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
+                        </div>
+                    }
 
-                    <div className="bg-input/30  flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
-                        <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
-                    </div>
-
-
-                    <div className="bg-input/30  flex-1 h-72 p-3  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
-                            <RoomAccess/>
-                    </div>
+                    <motion.div
+                        className="bg-input/30 flex-1 p-3 bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md"
+                        initial={{ height: '18rem' }}
+                        animate={{ height: isRoomCreated ? '32rem' : '18rem' }}
+                        transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                    >
+                        {!isRoomCreated ? <RoomAccess handleRoomCreate={handleRoomCreate} /> : <Chat />}
+                    </motion.div>
                 </div>
             </main>
 

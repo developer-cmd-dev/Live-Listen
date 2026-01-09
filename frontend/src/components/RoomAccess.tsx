@@ -23,14 +23,37 @@ import {
 } from "@/components/ui/toggle-group"
 import {LockIcon, MessageSquare } from "lucide-react"
 import { useAuthentication } from "@/store/zustand"
+import React, { useState, type ChangeEvent } from "react"
 
-export function RoomAccess() {
+
+export interface RoomAccessOptions {
+    isPrivate: boolean;
+    enabledChat: boolean;
+    username: string;
+    accessToken: string;
+    userLimit: number;
+}
+
+
+interface Props{
+    handleRoomCreate:()=>void;
+}
+
+
+export function RoomAccess({handleRoomCreate}:Props) {
 
 
     const {userData} = useAuthentication((state)=>state)
 
+    const [createRoomState,setCreateRoomState]=useState<RoomAccessOptions>({
+        isPrivate:false,
+        enabledChat:false,
+        username:"",
+        accessToken:"",
+        userLimit:1
+    })
 
-
+    
 
 
 
@@ -50,6 +73,7 @@ export function RoomAccess() {
                                 <ToggleGroupItem
                                     title="Enable private"
                                     value="private"
+                                    onClick={(e)=>console.log(e.target)}
                                     aria-label="toggle private"
                                     className="data-[state=on]:bg-transparent data-[state=on]:*:[svg]:fill-white data-[state=on]:*:[svg]:stroke-black"
                                 >
@@ -75,7 +99,7 @@ export function RoomAccess() {
                             </div>
                         </CardContent>
                         <CardFooter>
-                            <Button>Create Room</Button>
+                            <Button onClick={handleRoomCreate}>Create Room</Button>
                         </CardFooter>
                     </Card>
                 </TabsContent>
