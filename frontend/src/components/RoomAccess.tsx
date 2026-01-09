@@ -22,17 +22,29 @@ import {
     ToggleGroupItem,
 } from "@/components/ui/toggle-group"
 import {LockIcon, MessageSquare } from "lucide-react"
+import { useAuthentication } from "@/store/zustand"
 
 export function RoomAccess() {
+
+
+    const {userData} = useAuthentication((state)=>state)
+
+
+
+
+
+
+
+
     return (
         <div className=" flex flex-1 h-full  w-full max-w-full flex-col ">
-            <Tabs defaultValue="create-room">
+            <Tabs defaultValue="create-room" className="h-full">
                 <TabsList>
                     <TabsTrigger value="create-room">Create Room</TabsTrigger>
                     <TabsTrigger value="join-room">Join Room</TabsTrigger>
                 </TabsList>
-                <TabsContent value="create-room">
-                    <Card >
+                <TabsContent value="create-room" className="border-none">
+                    <Card  className="h-full">
                         <CardContent className=" grid gap-6">
                             <ToggleGroup  type="multiple" variant="outline" spacing={2} size="sm">
                                 <ToggleGroupItem
@@ -55,11 +67,11 @@ export function RoomAccess() {
                                 </ToggleGroupItem>
                             
 
-                                <Input type="number"  placeholder="Limit" max={10}/>
+                                <Input type="number"  placeholder="max friends 10" min={``} max={10}/>
                             </ToggleGroup>
                             <div className="grid gap-3">
                                 <Label  htmlFor="tabs-demo-username">Username</Label>
-                                <Input disabled id="tabs-demo-username" defaultValue="@peduarte" />
+                                <Input disabled id="tabs-demo-username" defaultValue={userData?.email} placeholder={userData?.email} />
                             </div>
                         </CardContent>
                         <CardFooter>
@@ -71,7 +83,7 @@ export function RoomAccess() {
 
 
                 <TabsContent className="" value="join-room">
-                    <Card className="border-none">
+                    <Card className="h-full">
 
                         <CardContent className="grid gap-6">
                             <div className="grid gap-3">

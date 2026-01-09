@@ -76,12 +76,6 @@ export default function Dashboard() {
 
 
 
-
-
-
-
-
-
     return (
         <div className="h-screen flex flex-col">
             {/* Header */}
@@ -139,12 +133,10 @@ export default function Dashboard() {
 
                     <div className="bg-input/30  flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
                         <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
-
                     </div>
 
 
-                    <div className="bg-input/30 flex-1 h-72 p-3  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
-
+                    <div className="bg-input/30  flex-1 h-72 p-3  bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md ">
                             <RoomAccess/>
                     </div>
                 </div>
