@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { useAuthentication } from './store/zustand'
 import Loading from './components/loading'
+import { GoogleOAuthProvider } from '@react-oauth/google'
 
 
 
@@ -14,6 +15,8 @@ function App() {
   const navigate = useNavigate();
   const { setIsLoggedIn, setUserData } = useAuthentication((state) => state)
   const [loading, setIsLoading] = useState(false);
+    const googleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+
 
   useEffect(() => {
 
@@ -67,7 +70,10 @@ function App() {
 
       <ThemeProvider defaultTheme='dark' storageKey='vite-ui-theme'>
         <Toaster theme='light' position={"top-center"} closeButton={true} />
+        <GoogleOAuthProvider clientId={googleClientId}>
         {loading ? <Loading/>:<Outlet />}
+
+        </GoogleOAuthProvider>
       </ThemeProvider>
     </>
   )

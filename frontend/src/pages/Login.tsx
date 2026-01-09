@@ -3,14 +3,10 @@ import { useAuthentication } from '@/store/zustand'
 import axios, { Axios, AxiosError } from 'axios'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
-function Login() {
-
-  const navigate = useNavigate()
-  const {setIsLoggedIn,setUserData}=useAuthentication((state)=>state)
-  const url = import.meta.env.VITE_BACKEND_URL;
+import {GoogleLogin, GoogleOAuthProvider, useGoogleLogin, type CredentialResponse} from '@react-oauth/google'
 
 
-  type LoginResponse = {
+type LoginResponse = {
     userData:{
       id:number;
       name:string;
@@ -20,6 +16,18 @@ function Login() {
     accessToken:string;
   }
 
+
+
+
+
+function Login() {
+
+  const navigate = useNavigate()
+  const {setIsLoggedIn,setUserData}=useAuthentication((state)=>state)
+  const url = import.meta.env.VITE_BACKEND_URL;
+
+
+  
 
   const handleSubmit = async (formData:FormData)=>{
     try {
@@ -40,9 +48,28 @@ function Login() {
   }
 
 
+
+  const googleAuth = async(authData:any)=>{
+      try {
+        console.log(authData)
+      } catch (error) {
+        console.log(error)
+      }
+  }
+
+  const googleLogin = useGoogleLogin({
+    onSuccess:googleAuth,
+    onError:googleAuth,
+    flow:"auth-code"
+  })
+
+
+ 
+
+
   return (
 
-    <div className="min-h-screen flex items-center justify-center w-full bg-[#020617] relative">
+          <div className="min-h-screen flex items-center justify-center w-full bg-[#020617] relative">
       {/* Orange Radial Glow Background */}
       <div
         className="absolute inset-0 z-0"
@@ -53,10 +80,13 @@ function Login() {
 
 
       <div className=' z-10 w-sm'>
-        <LoginForm handleSubmit={handleSubmit} className='border-none' />
+
+        <LoginForm handleGoogleLogin={googleLogin} handleSubmit={handleSubmit} className='border-none' />
+
 
       </div>
     </div>
+
 
 
 
