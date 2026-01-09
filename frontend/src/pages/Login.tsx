@@ -1,9 +1,8 @@
 import { LoginForm, type FormData } from '@/components/login-form'
 import { useAuthentication } from '@/store/zustand'
-import axios, { Axios, AxiosError } from 'axios'
+import axios from 'axios'
 import { useNavigate } from 'react-router'
 import { toast } from 'sonner'
-import {GoogleLogin, GoogleOAuthProvider, useGoogleLogin, type CredentialResponse} from '@react-oauth/google'
 
 
 type LoginResponse = {
@@ -49,20 +48,10 @@ function Login() {
 
 
 
-  const googleAuth = async(authData:any)=>{
-      try {
-        console.log(authData)
-      } catch (error) {
-        console.log(error)
-      }
-  }
+const handleGoogleAuth =async ()=>{
+   window.location.href = `${url}/auth/googleauth`;
 
-  const googleLogin = useGoogleLogin({
-    onSuccess:googleAuth,
-    onError:googleAuth,
-    flow:"auth-code"
-  })
-
+}
 
  
 
@@ -81,7 +70,7 @@ function Login() {
 
       <div className=' z-10 w-sm'>
 
-        <LoginForm handleGoogleLogin={googleLogin} handleSubmit={handleSubmit} className='border-none' />
+        <LoginForm handleGoogleLogin={handleGoogleAuth} handleSubmit={handleSubmit} className='border-none' />
 
 
       </div>

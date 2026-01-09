@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { type Response,type Request } from "express";
+import { type Response, type Request } from "express";
 import { CustomError } from "../error/ErrorHandler.js";
 import { createUser, login } from "../controller/user.controller.js";
 import authMiddleware from "../middleware/auth.middleware.js";
@@ -8,20 +8,22 @@ import { searchController } from "../controller/search.controller.js";
 import { addSong, createPlaylist, deletePlaylist, updatePlaylist } from "../controller/playlist.controller.js";
 import { startJam } from "../controller/jamming.controller.js";
 import { refreshToken } from "../controller/authentication.controller.js";
+import passportMiddleware from "../middleware/passport.middlware.js";
+import passport from '../config/passport.js'
 const route = Router();
 
 
 
-route.post("/auth/signup",createUser);
-route.post("/auth/login",authMiddleware,login);
-route.post("/auth/refresh",refreshToken)
-route.get("/",dashboard);
-route.get("/search/:name",searchController);
-route.post("/create-playlist",authMiddleware,createPlaylist);
-route.post("/add-song",authMiddleware,addSong)
-route.put("/update-playlist/:id",authMiddleware,updatePlaylist);
-route.delete("/delete-playlist/:id",authMiddleware,deletePlaylist);
-route.get("/start-jam",authMiddleware,startJam);
+route.post("/auth/signup", createUser);
+route.post("/auth/login", authMiddleware, login);
+route.post("/auth/refresh", refreshToken);
+route.get("/", dashboard);
+route.get("/search/:name", searchController);
+route.post("/create-playlist", authMiddleware, createPlaylist);
+route.post("/add-song", authMiddleware, addSong)
+route.put("/update-playlist/:id", authMiddleware, updatePlaylist);
+route.delete("/delete-playlist/:id", authMiddleware, deletePlaylist);
+route.get("/start-jam", authMiddleware, startJam);
 
 
 

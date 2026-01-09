@@ -1,4 +1,12 @@
-import { verify } from 'jsonwebtoken';
-import passport from 'passport';
-import { Strategy } from 'passport-google-oauth20';
+import passport from "../config/passport.js";
+import { email } from "zod";
+const passportMiddleware = async (req, res, next) => {
+    passport.authenticate("google", {
+        session: false,
+        scope: ["profile", "email"]
+    }, async (err, userData) => {
+        console.log(userData);
+    })(req, res, next);
+};
+export default passportMiddleware;
 //# sourceMappingURL=passport.middlware.js.map
