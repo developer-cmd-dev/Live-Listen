@@ -7,6 +7,7 @@ import express from 'express';
 import cookieParser from 'cookie-parser';
 import { redisClient } from './utility/RedisClient.js';
 import morgan from 'morgan';
+import passport from 'passport';
 const app = express();
 const port = Number(process.env.PORT) || 3000;
 const client = new PrismaClient();
@@ -17,6 +18,7 @@ app.use(cors({
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
+app.use(passport.initialize());
 client.$connect().then(() => {
     console.log("Db is connected");
     redisClient.connect().then(() => {

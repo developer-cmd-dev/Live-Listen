@@ -1,19 +1,20 @@
 import { LoginForm, type FormData } from '@/components/login-form'
 import { useAuthentication } from '@/store/zustand'
-import axios from 'axios'
-import { useNavigate } from 'react-router'
+import { useGoogleLogin } from '@react-oauth/google'
+import axios, { type AxiosResponse } from 'axios'
+import { data, useNavigate } from 'react-router'
 import { toast } from 'sonner'
 
 
 type LoginResponse = {
-    userData:{
-      id:number;
-      name:string;
-      email:string;
-      playlist:[]
-    };
-    accessToken:string;
-  }
+  userData: {
+    id: number;
+    name: string;
+    email: string;
+    playlist: []
+  };
+  accessToken: string;
+}
 
 
 
@@ -22,43 +23,63 @@ type LoginResponse = {
 function Login() {
 
   const navigate = useNavigate()
-  const {setIsLoggedIn,setUserData}=useAuthentication((state)=>state)
+  const { setIsLoggedIn, setUserData } = useAuthentication((state) => state)
   const url = import.meta.env.VITE_BACKEND_URL;
 
 
-  
 
-  const handleSubmit = async (formData:FormData)=>{
+
+  const handleSubmit = async (formData: FormData) => {
     try {
-      const response =await axios.post(`${url}/auth/login`,formData,{withCredentials:true})
-      const payload:LoginResponse = response.data;
-      localStorage.setItem("access-token",payload.accessToken);
-      setIsLoggedIn(true);
-      setUserData(response.data)
-      navigate("/dashboard")
-      toast.success("Login Success")
+      const response = await axios.post(`${url}/auth/login`, formData, { withCredentials: true })
+     handleAuthState(response)
     } catch (error) {
-      if(axios.isAxiosError(error)){
+      if (axios.isAxiosError(error)) {
         toast.error(error.response?.data)
-      }else{
+      } else {
         console.log(error)
       }
     }
   }
 
 
+  const handleAuthState=(response:AxiosResponse)=>{
+    const payload: LoginResponse = response.data;
+    localStorage.setItem("access-token", payload.accessToken);
+    setIsLoggedIn(true);
+    setUserData(response.data)
+    navigate("/dashboard")
+    toast.success("Login Success")
+  }
 
-const handleGoogleAuth =async ()=>{
-   window.location.href = `${url}/auth/googleauth`;
 
-}
+  const googleAuth =async (authResult: any) => {
+    try {
+      if(authResult.code){
+          const code = authResult.code;
+          const response = await axios.post(`${url}/auth/googleauth`,{data:code})
+          handleAuthState(response);
+      }else{
+        toast.message("Access Denied")
+      }
+    } catch (error) {
+  
+    }
+  }
 
- 
+  const googleLogin = useGoogleLogin({
+    onSuccess: googleAuth,
+    onError: googleAuth,
+    flow: "auth-code"
+  })
+
+
+
 
 
   return (
 
-          <div className="min-h-screen flex items-center justify-center w-full bg-[#020617] relative">
+    <div className="min-h-screen flex items-center justify-center w-full bg-[#020617] relative">
       {/* Orange Radial Glow Background */}
       <div
         className="absolute inset-0 z-0"
@@ -70,7 +91,7 @@ const handleGoogleAuth =async ()=>{
 
       <div className=' z-10 w-sm'>
 
-        <LoginForm handleGoogleLogin={handleGoogleAuth} handleSubmit={handleSubmit} className='border-none' />
+        <LoginForm handleGoogleLogin={googleLogin} handleSubmit={handleSubmit} className='border-none' />
 
 
       </div>
