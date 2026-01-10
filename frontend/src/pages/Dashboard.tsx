@@ -19,8 +19,7 @@ export default function Dashboard() {
 
     const { userData } = useAuthentication((state) => state)
     const [roomId, setRoomId] = useState<number | null>(null)
-    const [socket, setSocket] = useState<w3cwebsocket | null>(null)
-    const ws = new w3cwebsocket(webSocketUrl)
+    const socket = new w3cwebsocket(webSocketUrl)
 
 
 
@@ -38,6 +37,33 @@ export default function Dashboard() {
             }
         })()
     }, [])
+
+    useEffect(() => {
+        (async () => {
+            if (socket && userData) {
+                const accessToken = localStorage.getItem('access-token');
+                const data = {
+                    type: "connect",
+                    data: {
+                        email: userData?.email,
+                        userId: userData?.id,
+                        accessToken: accessToken
+                    }
+                }
+
+                
+                socket.onopen = ()=>{
+                    socket.send(JSON.stringify(data));
+                }
+                socket.onmessage = (data) => {
+                    console.log(data)
+                }
+            }
+        })()
+    }, [socket])
+
+
+
 
     const setSong = useSongState((state) => state.setSong)
     const setIsPlayCurrentSong = useHandleCurrentSong((state) => state.setIsPlayCurrentSong)
@@ -89,37 +115,18 @@ export default function Dashboard() {
 
 
 
-    // const connectWebsocket = async () => {
-    //     try {
-    //         const roomId = Math.floor(Math.random() * 10000)
-    //         const ws = await webSocketConnection(`${webSocketUrl}?roomId=${roomId}&type=create&email=${userData?.email}&userId=${userData?.id}`);
-    //         ws.onmessage = (data) => {
-    //             const payload = JSON.parse(data.data.toString());
-    //             setRoomId(payload.data.roomId)
-    //             toast.success("Room Created")
-    //             handleRoomCreate()
-    //         }
-    //         ws.onclose = () => {
-    //             console.log('socket closed')
-    //         }
-
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-
-    // }
-
-
     const connectWebsocket = async () => {
-       
+    try {
+        socket.send("")
+    } catch (error) {
+        
+    }
 
     }
 
 
 
-    const webSocketConnection = async (url: string) => {
-        return new w3cwebsocket(url, 'echo-protocol');
-    }
+
 
 
 
