@@ -1,10 +1,10 @@
 class User {
     userId;
-    name;
+    email;
     userSocket;
-    constructor(userId, name, socket) {
+    constructor(userId, email, socket) {
         this.userId = userId;
-        this.name = name;
+        this.email = email;
         this.userSocket = socket;
     }
 }

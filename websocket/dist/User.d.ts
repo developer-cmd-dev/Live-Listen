@@ -1,9 +1,9 @@
 import type WebSocket from "ws";
 declare class User {
     userId: number;
-    name: string;
+    email: string;
     userSocket: any;
-    constructor(userId: number, name: string, socket: WebSocket);
+    constructor(userId: number, email: string, socket: WebSocket);
 }
 export default User;
 //# sourceMappingURL=User.d.ts.map

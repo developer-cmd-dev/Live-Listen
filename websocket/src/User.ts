@@ -3,11 +3,11 @@ import type WebSocket from "ws";
 
 class User{
     public userId:number;
-    public name:string;
+    public email:string;
     public userSocket:any;
-    constructor(userId:number,name:string,socket:WebSocket){
+    constructor(userId:number,email:string,socket:WebSocket){
         this.userId=userId;
-        this.name=name;
+        this.email=email;
         this.userSocket=socket;
     }
 }

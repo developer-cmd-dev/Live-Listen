@@ -5,13 +5,14 @@ import url from 'url'
 import { parse as parseQuery } from 'querystring'
 import User from './User.js';
 import Response from './Response.js';
+import { json } from 'stream/consumers';
 
-let roomsMap = new Map<string, Room>;
+let roomsMap = new Map<number, Room>();
 
 type Query = {
     roomId: string;
     type: "create" | "join";
-    name: string;
+    email: string;
     userId: number;
 };
 
@@ -37,19 +38,22 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
     try {
         const getUrl = req.url;
         const parsedUrl = url.parse(getUrl || "");
-        const { roomId, type, name, userId }: Query = parseQuery(parsedUrl.query || "") as unknown as Query;
+        const { type,roomId, email, userId }: Query = parseQuery(parsedUrl.query || "") as unknown as Query;
+        const generatedId = Number(Math.floor(Math.random()*10000));
+        
         if (type === "create") {
-            const room = new Room(Number(roomId), name, userId);
-            room.setUser(new User(userId, name, socket), userId);
-            roomsMap.set(roomId, room);
-
+            const room = new Room(generatedId, email, userId);
+            const user = new User(userId,email,socket);
+            room.setUser(user, userId);
+            roomsMap.set(generatedId, room);
+            socket.send(JSON.stringify(new Response(true,"success",{roomId:generatedId})))
         } else if (type === "join") {
-            const hasRoom = roomsMap.has(roomId);
-            const response = new Response(false, "Rooms has expired")
+            const hasRoom = roomsMap.has(Number(roomId));
+            const response = new Response(false, "Rooms has expired",null)
             if (!hasRoom) socket.send(JSON.stringify(response))
 
-            const getRoom = roomsMap.get(roomId);
-            getRoom?.setUser(new User(userId, name, socket), userId)
+            const getRoom = roomsMap.get(Number(roomId));
+            getRoom?.setUser(new User(userId, email, socket), userId)
 
         }
 
@@ -57,7 +61,7 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
 
         
         socket.on('message',(data)=>{
-            const getRoom = roomsMap.get(roomId);
+            const getRoom = roomsMap.get(Number(roomId));
             const usersMap:Map<number,User> |undefined= getRoom?.users;
 
             const messageData:ChatMessage=JSON.parse(data.toLocaleString());
@@ -80,10 +84,10 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         socket.on('close', () => {
             console.log("socket has disconnected", roomId)
             if (type === "create") {
-                roomsMap.delete(roomId);
+                roomsMap.delete(Number(roomId));
 
             } else if (type === "join") {
-                const getRoom = roomsMap.get(roomId);
+                const getRoom = roomsMap.get(Number(roomId));
                 getRoom?.destroyUser(userId);
             }
         })

@@ -5,18 +5,20 @@ import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
-import { useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
+import { useAuthentication, useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
 import Navbar from "@/components/Navbar"
 import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
 import Chat from "@/components/Chat"
 import { motion } from 'motion/react'
-
+import{w3cwebsocket} from 'websocket'
 
 export default function Dashboard() {
-
+    const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
     const [songs, setSongs] = useState<Songs[]>([])
     const [activeSong, setActiveSong] = useState<number | null>(null)
-
+    const ws = new w3cwebsocket(webSocketUrl,'echo-protocol');
+    const {userData}=useAuthentication((state)=>state)
+    const [roomId,setRoomId]=useState<number|null>(null)
 
 
 
@@ -86,6 +88,26 @@ export default function Dashboard() {
 
 
 
+    const connectWebsocket=async()=>{
+        try {
+            const ws = await webSocketConnection(`${webSocketUrl}?type=create&email=${userData?.email}&userId=${userData?.id}`);
+            ws.onmessage = (data)=>{
+                const payload = JSON.parse(data.data.toString());
+                setRoomId(payload.data.roomId)
+                handleRoomCreate()
+            }
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
+
+    const webSocketConnection=async(url:string)=>{
+        return  new w3cwebsocket(url,'echo-protocol');
+    }
+
+
 
     return (
         <div className="h-screen flex flex-col">
@@ -117,13 +139,11 @@ export default function Dashboard() {
                         </div>
                     </section>
 
-                    {/* Songs */}
                     <section className="flex flex-col flex-1 space-y-4 min-h-0">
                         <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
                             Songs
                         </h1>
 
-                        {/* ONLY this scrolls */}
                         <div className="flex-1 overflow-auto flex flex-col gap-3">
 
                             {songs?.length > 0 ? songs?.map((songs) => (
@@ -153,7 +173,7 @@ export default function Dashboard() {
                         animate={{ height: isRoomCreated ? '32rem' : '18rem' }}
                         transition={{ type: "spring", stiffness: 200, damping: 25 }}
                     >
-                        {!isRoomCreated ? <RoomAccess handleRoomCreate={handleRoomCreate} /> : <Chat />}
+                        {!isRoomCreated ? <RoomAccess handleRoomCreate={connectWebsocket} /> : <Chat roomId={roomId} handleRoomCreate={handleRoomCreate} />}
                     </motion.div>
                 </div>
             </main>

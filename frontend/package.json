@@ -23,6 +23,7 @@
     "@radix-ui/react-tooltip": "^1.2.8",
     "@react-oauth/google": "^0.13.4",
     "@tailwindcss/vite": "^4.1.17",
+    "@types/websocket": "^1.0.10",
     "axios": "^1.13.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -38,6 +39,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",
+    "websocket": "^1.0.35",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
