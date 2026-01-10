@@ -10,16 +10,17 @@ import Navbar from "@/components/Navbar"
 import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
 import Chat from "@/components/Chat"
 import { motion } from 'motion/react'
-import{w3cwebsocket} from 'websocket'
+import { w3cwebsocket } from 'websocket'
 
 export default function Dashboard() {
     const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
     const [songs, setSongs] = useState<Songs[]>([])
     const [activeSong, setActiveSong] = useState<number | null>(null)
-    const ws = new w3cwebsocket(webSocketUrl,'echo-protocol');
-    const {userData}=useAuthentication((state)=>state)
-    const [roomId,setRoomId]=useState<number|null>(null)
 
+    const { userData } = useAuthentication((state) => state)
+    const [roomId, setRoomId] = useState<number | null>(null)
+    const [socket, setSocket] = useState<w3cwebsocket | null>(null)
+    const ws = new w3cwebsocket(webSocketUrl)
 
 
 
@@ -88,23 +89,36 @@ export default function Dashboard() {
 
 
 
-    const connectWebsocket=async()=>{
-        try {
-            const ws = await webSocketConnection(`${webSocketUrl}?type=create&email=${userData?.email}&userId=${userData?.id}`);
-            ws.onmessage = (data)=>{
-                const payload = JSON.parse(data.data.toString());
-                setRoomId(payload.data.roomId)
-                handleRoomCreate()
-            }
-        } catch (error) {
-            console.log(error)
-        }
+    // const connectWebsocket = async () => {
+    //     try {
+    //         const roomId = Math.floor(Math.random() * 10000)
+    //         const ws = await webSocketConnection(`${webSocketUrl}?roomId=${roomId}&type=create&email=${userData?.email}&userId=${userData?.id}`);
+    //         ws.onmessage = (data) => {
+    //             const payload = JSON.parse(data.data.toString());
+    //             setRoomId(payload.data.roomId)
+    //             toast.success("Room Created")
+    //             handleRoomCreate()
+    //         }
+    //         ws.onclose = () => {
+    //             console.log('socket closed')
+    //         }
+
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+
+    // }
+
+
+    const connectWebsocket = async () => {
+       
 
     }
 
 
-    const webSocketConnection=async(url:string)=>{
-        return  new w3cwebsocket(url,'echo-protocol');
+
+    const webSocketConnection = async (url: string) => {
+        return new w3cwebsocket(url, 'echo-protocol');
     }
 
 
@@ -173,7 +187,7 @@ export default function Dashboard() {
                         animate={{ height: isRoomCreated ? '32rem' : '18rem' }}
                         transition={{ type: "spring", stiffness: 200, damping: 25 }}
                     >
-                        {!isRoomCreated ? <RoomAccess handleRoomCreate={connectWebsocket} /> : <Chat roomId={roomId} handleRoomCreate={handleRoomCreate} />}
+                        {!isRoomCreated ? <RoomAccess handleRoomCreate={connectWebsocket} /> : <Chat socket={socket} roomId={roomId} handleRoomCreate={handleRoomCreate} />}
                     </motion.div>
                 </div>
             </main>

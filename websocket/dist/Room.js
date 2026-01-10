@@ -1,12 +1,20 @@
 class Room {
     roomId;
-    name;
+    email;
     userId;
+    roomName;
+    enabledChat;
+    isPrivate;
+    userLimit;
     users = new Map();
-    constructor(roomId, name, userId) {
+    constructor(roomId, email, userId, roomName, enabledChat, isPrivate, userLimit) {
         this.roomId = roomId;
-        this.name = name;
+        this.email = email;
         this.userId = userId;
+        this.roomName = roomName;
+        this.enabledChat = enabledChat;
+        this.isPrivate = isPrivate;
+        this.userLimit = userLimit;
     }
     setUser(user, userId) {
         this.users.set(userId, user);

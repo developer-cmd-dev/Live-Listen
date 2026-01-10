@@ -4,15 +4,23 @@ import type User from "./User.js";
 class Room{
 
     private roomId:number;
-    public name:string;
-    public userId:number;
-    public users=new Map<number,User>();
+     email:string;
+     userId:number;
+     roomName:string|undefined;
+     enabledChat:boolean;
+     isPrivate:boolean;
+     userLimit:number;
+     users=new Map<number,User>();
     
 
-    constructor(roomId:number,name:string,userId:number){
+    constructor(roomId:number,email:string,userId:number,roomName:string|undefined,enabledChat:boolean,isPrivate:boolean,userLimit:number){
         this.roomId=roomId;
-        this.name=name;
+        this.email=email;
         this.userId=userId;
+        this.roomName=roomName;
+        this.enabledChat=enabledChat;
+        this.isPrivate=isPrivate;
+        this.userLimit=userLimit;
     }
 
     setUser(user:User,userId:number){
