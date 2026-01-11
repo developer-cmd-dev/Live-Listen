@@ -73,5 +73,8 @@ wss.on('connection', (socket, req) => {
             console.log(error);
         }
     });
+    socket.on('close', () => {
+        console.log('socket disconnected');
+    });
 });
 //# sourceMappingURL=index.js.map

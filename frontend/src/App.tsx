@@ -26,6 +26,8 @@ function App() {
         const accessToken = localStorage.getItem("access-token");
         if (accessToken) {
           loginUsingAccessToken(accessToken);
+        }else{
+          return
         }
       } catch (error) {
         if (axios.isAxiosError(error)) {

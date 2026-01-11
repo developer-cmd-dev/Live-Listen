@@ -44,6 +44,7 @@ try {
                 password:null,
             },
             select:{
+                id:true,
                 email:true,
                 name:true,
                 playlist:true,

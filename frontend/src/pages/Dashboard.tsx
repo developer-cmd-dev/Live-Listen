@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react"
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, toFormData } from 'axios'
 import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
@@ -11,6 +11,7 @@ import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
 import Chat from "@/components/Chat"
 import { motion } from 'motion/react'
 import { w3cwebsocket } from 'websocket'
+import type { SocketConnection } from "@/types/types"
 
 export default function Dashboard() {
     const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
@@ -19,7 +20,7 @@ export default function Dashboard() {
 
     const { userData } = useAuthentication((state) => state)
     const [roomId, setRoomId] = useState<number | null>(null)
-    const socket = new w3cwebsocket(webSocketUrl)
+    const socket = new w3cwebsocket(webSocketUrl);
 
 
 
@@ -51,15 +52,17 @@ export default function Dashboard() {
                     }
                 }
 
-                
                 socket.onopen = ()=>{
                     socket.send(JSON.stringify(data));
                 }
-                socket.onmessage = (data) => {
-                    console.log(data)
+                socket.onmessage = (data:any) => {
+                    const success = JSON.parse(data.data as string) as SocketConnection;
+                    if(!success.success) toast.error(success.message);
                 }
             }
         })()
+
+ 
     }, [socket])
 
 
@@ -115,9 +118,9 @@ export default function Dashboard() {
 
 
 
-    const connectWebsocket = async () => {
+    const createRoom = async () => {
     try {
-        socket.send("")
+        
     } catch (error) {
         
     }
@@ -194,7 +197,7 @@ export default function Dashboard() {
                         animate={{ height: isRoomCreated ? '32rem' : '18rem' }}
                         transition={{ type: "spring", stiffness: 200, damping: 25 }}
                     >
-                        {!isRoomCreated ? <RoomAccess handleRoomCreate={connectWebsocket} /> : <Chat socket={socket} roomId={roomId} handleRoomCreate={handleRoomCreate} />}
+                        {!isRoomCreated ? <RoomAccess handleRoomCreate={createRoom} /> : <Chat socket={socket} roomId={roomId} handleRoomCreate={handleRoomCreate} />}
                     </motion.div>
                 </div>
             </main>
@@ -209,7 +212,7 @@ export default function Dashboard() {
 export interface Songs {
     id: number;
     name: string;
-    duration: number; // seconds
+    duration: number; 
 
     artist_id: string;
     artist_name: string;

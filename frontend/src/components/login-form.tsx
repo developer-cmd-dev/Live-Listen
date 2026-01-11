@@ -15,13 +15,16 @@ import {
   FieldSeparator,
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
-import { useState, type ChangeEvent } from "react"
+import React, { useState, type ChangeEvent } from "react"
+import Loading from "./loading"
 
 
 interface Props {
   className: string;
   handleSubmit: (formData: FormData) => void;
   handleGoogleLogin:()=>void;
+  loading:boolean;
+
 }
 export interface FormData {
   email: string;
@@ -31,7 +34,8 @@ export interface FormData {
 export function LoginForm({
   className,
   handleSubmit,
-  handleGoogleLogin
+  handleGoogleLogin,
+  loading
 }: Props) {
 
 
@@ -53,7 +57,7 @@ export function LoginForm({
 
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} >
+    <div  className={cn("flex flex-col gap-6", className)} >
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back Live Listen</CardTitle>
@@ -109,7 +113,7 @@ export function LoginForm({
                 <Input id="password" name="password" onChange={handleFormData} type="password" required />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button disabled={loading} type="submit">{!loading?"Login":<Loading/>}</Button>
                 <FieldDescription className="text-center">
                   Don&apos;t have an account? <a href="#">Sign up</a>
                 </FieldDescription>

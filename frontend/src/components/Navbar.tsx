@@ -1,9 +1,22 @@
 import React from 'react'
 import { Input } from './ui/input'
 import { Button } from './ui/button'
-import { Search } from 'lucide-react'
+import { LogOut, Search } from 'lucide-react'
+import { useAuthentication } from '@/store/zustand'
+import { useNavigate } from 'react-router'
+import { toast } from 'sonner'
 
 function Navbar() {
+
+    const {userData,setUserData} = useAuthentication((state)=>state)
+    const navigate = useNavigate();
+
+    const handleLogout = ()=>{
+        setUserData(null);
+        localStorage.removeItem('access-token');
+        navigate('/login');
+        
+    }
   return (
       <header className="relative w-full h-14 sm:h-16 flex items-center px-2 sm:px-4">
                 {/* Logo - Left */}
@@ -16,7 +29,7 @@ function Navbar() {
                 </div>
 
                 {/* Search - Center */}
-                <div className="mx-auto w-full max-w-3xl flex items-center gap-2">
+                <div className="mx-auto  w-full max-w-3xl flex items-center gap-2">
                     <Input
                         className="border-none w-full text-sm sm:text-base"
                         placeholder="Search Song"
@@ -24,6 +37,11 @@ function Navbar() {
                     <Button type="button" className="shrink-0" variant="secondary">
                         <Search className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
+                </div>
+                
+
+                <div className='w-30  h-fullflex items-center justify-center'>
+                    <Button onClick={handleLogout}>Logout <LogOut/></Button>
                 </div>
             </header>
   )

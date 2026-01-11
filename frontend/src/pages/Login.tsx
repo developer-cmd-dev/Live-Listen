@@ -2,6 +2,7 @@ import { LoginForm, type FormData } from '@/components/login-form'
 import { useAuthentication } from '@/store/zustand'
 import { useGoogleLogin } from '@react-oauth/google'
 import axios, { type AxiosResponse } from 'axios'
+import { useState } from 'react'
 import { data, useNavigate } from 'react-router'
 import { toast } from 'sonner'
 
@@ -25,6 +26,7 @@ function Login() {
   const navigate = useNavigate()
   const { setIsLoggedIn, setUserData } = useAuthentication((state) => state)
   const url = import.meta.env.VITE_BACKEND_URL;
+  const [loading,setLoading]=useState(false);
 
 
 
@@ -45,9 +47,11 @@ function Login() {
 
   const handleAuthState=(response:AxiosResponse)=>{
     const payload: LoginResponse = response.data;
+    console.log(payload)
     localStorage.setItem("access-token", payload.accessToken);
     setIsLoggedIn(true);
-    setUserData(response.data)
+    setUserData(payload.userData)
+    setLoading(false);
     navigate("/dashboard")
     toast.success("Login Success")
   }
@@ -55,12 +59,15 @@ function Login() {
 
   const googleAuth =async (authResult: any) => {
     try {
+      
       if(authResult.code){
           const code = authResult.code;
           const response = await axios.post(`${url}/auth/googleauth`,{data:code})
+          setLoading(true);
           handleAuthState(response);
       }else{
         toast.message("Access Denied")
+        setLoading(false)
       }
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -95,7 +102,7 @@ function Login() {
 
       <div className=' z-10 w-sm'>
 
-        <LoginForm handleGoogleLogin={googleLogin} handleSubmit={handleSubmit} className='border-none' />
+        <LoginForm handleGoogleLogin={googleLogin} handleSubmit={handleSubmit} loading={loading} className='border-none' />
 
 
       </div>

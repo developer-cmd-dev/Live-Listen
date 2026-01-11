@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { type Songs } from '@/pages/Dashboard'
+import type { UserAuthPayload } from '@/types/types';
 
 type SongStore={
     song:Songs|null;
@@ -17,18 +18,13 @@ type IsPlaying = {
     setIsPlaying: (value:boolean)=>void;
 }
 
-type UserData = {
-    id:number;
-    name:string;
-    email:string;
-    playlist:object
-}
+
 
 
 interface Authentication {
-    userData:UserData|null;
+    userData:UserAuthPayload|null;
     isLoggedIn:boolean;
-    setUserData:(data:UserData)=>void;
+    setUserData:(data:UserAuthPayload|null)=>void;
     setIsLoggedIn:(data:boolean)=>void;
 }
 
@@ -55,7 +51,7 @@ const useIsPlaying = create<IsPlaying>((set)=>({
 const useAuthentication= create<Authentication>((set)=>({
     userData:null,
     isLoggedIn:false,
-    setUserData:(data:UserData)=>set({userData:data}),
+    setUserData:(data:UserAuthPayload)=>set({userData:data}),
     setIsLoggedIn:(data:boolean)=>set({isLoggedIn:data})
 }))
 

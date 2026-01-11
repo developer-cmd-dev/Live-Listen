@@ -32,12 +32,12 @@ interface RoomCreatePayload {
     roomName?: string;
     enabledChat: boolean;
     isPrivate: false;
-    userLimit: 10;
+    userLimit: number;
 }
 
-interface Message{
-    roomId:number;
-    message:string;
+interface Message {
+    roomId: number;
+    message: string;
 }
 
 
@@ -49,7 +49,7 @@ const wss = new WebSocketServer({ port: port });
 console.log("Websocket is running on " + port)
 wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
 
-    
+
 
     let userData: User;
 
@@ -57,9 +57,9 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
     const handleConnect = (data: any) => {
         const userPayload = data as UserPayload;
         const verifyToken = JWT.verifyToken(userPayload.accessToken);
-        if(!verifyToken) socket.send(JSON.stringify(new Response(false,"Invalid Credential",null)))
+        if (!verifyToken) socket.send(JSON.stringify(new Response(false, "Invalid Credential", null)))
         userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true, socket);
-    console.log("Connected with ",userPayload.email)
+        console.log("Connected with ", userPayload.email)
         socket.send(JSON.stringify(new Response(true, "Websocket connected", null)))
     }
 
@@ -86,18 +86,18 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         socket.send(JSON.stringify(new Response(true, "Joined Room", null)));
     }
 
-    const handleMessage = (data:any) => {
+    const handleMessage = (data: any) => {
         const payload = data as Message;
 
         const getRoom = roomsMap.get(payload.roomId);
 
-        const getSocketMap= getRoom?.getUsers();
-        getSocketMap?.forEach((value:User,key:number)=>{
-            if(value.userSocket!=socket){
+        const getSocketMap = getRoom?.getUsers();
+        getSocketMap?.forEach((value: User, key: number) => {
+            if (value.userSocket != socket) {
                 socket.send(JSON.stringify(payload.message));
             }
         })
-        
+
 
     }
 
@@ -118,6 +118,10 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         } catch (error) {
             console.log(error)
         }
+    })
+
+    socket.on('close',()=>{
+        console.log('socket disconnected')
     })
 
 })
