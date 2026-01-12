@@ -22,12 +22,10 @@ declare class Room {
         isPrivate: boolean;
         userLimit: number;
         users: {
-            [k: string]: {
-                userId: number;
-                email: string;
-                isVerified: boolean;
-            };
-        };
+            userId: number;
+            email: string;
+            isVerified: boolean;
+        }[][];
     };
 }
 export default Room;

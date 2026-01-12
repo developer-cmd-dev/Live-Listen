@@ -72,8 +72,8 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
             socket.send(JSON.stringify(new Response(true, "Room created", { data: room.toJson() })))
-            // console.log(`Room created by ${userData.email} with ${roomId}`)
-            console.log(room.toJson())
+            console.log(`Room created by ${userData.email} with ${roomId}`)
+
         } else {
             socket.send(JSON.stringify(new Response(false, "Room has already created", null)));
         }

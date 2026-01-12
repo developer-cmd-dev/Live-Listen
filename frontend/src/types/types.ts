@@ -40,11 +40,9 @@ export interface RoomType {
     enabledChat: boolean;
     isPrivate: boolean;
     userLimit: number;
-    users: {
-        [userId: number]: {
-            userId: number;
-            email: string;
-            isVerified: boolean;
-        }
-    };
+    users:[{
+        userId: number;
+        email: string;
+        isVerified: boolean;
+    }]|null;
 }

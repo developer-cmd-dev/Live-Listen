@@ -43,16 +43,15 @@ class Room{
             enabledChat: this.enabledChat,
             isPrivate: this.isPrivate,
             userLimit: this.userLimit,
-            users: Object.fromEntries(
+            users: 
                 Array.from(this.users.entries()).map(([userId, user]) => [
-                    userId,
                     {
                         userId: user.userId,
                         email: user.email,
                         isVerified: user.isVerified
                     }
                 ])
-            )
+            
         }
     }
 
