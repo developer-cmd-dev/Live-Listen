@@ -13,6 +13,22 @@ declare class Room {
     destroyUser(userId: number): void;
     getUsers(): Map<number, User>;
     getRoomId(): number;
+    toJson(): {
+        roomId: number;
+        email: string;
+        userId: number;
+        roomName: string | undefined;
+        enabledChat: boolean;
+        isPrivate: boolean;
+        userLimit: number;
+        users: {
+            [k: string]: {
+                userId: number;
+                email: string;
+                isVerified: boolean;
+            };
+        };
+    };
 }
 export default Room;
 //# sourceMappingURL=Room.d.ts.map

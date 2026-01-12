@@ -20,7 +20,8 @@ wss.on('connection', (socket, req) => {
         const verifyToken = JWT.verifyToken(userPayload.accessToken);
         if (!verifyToken)
             socket.send(JSON.stringify(new Response(false, "Invalid Credential", null)));
-        userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true, socket);
+        userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true);
+        userData.setUserSocket(socket);
         console.log("Connected with ", userPayload.email);
         socket.send(JSON.stringify(new Response(true, "Websocket connected", null)));
     };
@@ -31,8 +32,9 @@ wss.on('connection', (socket, req) => {
             const room = new Room(roomId, userData.email, userData.userId, roomName, enabledChat, isPrivate, userLimit);
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
-            socket.send(JSON.stringify(new Response(true, "Room created", { roomId: roomId })));
-            console.log(`Room created by ${userData.email} with ${roomId}`);
+            socket.send(JSON.stringify(new Response(true, "Room created", { data: room.toJson() })));
+            // console.log(`Room created by ${userData.email} with ${roomId}`)
+            console.log(room.toJson());
         }
         else {
             socket.send(JSON.stringify(new Response(false, "Room has already created", null)));
@@ -53,7 +55,7 @@ wss.on('connection', (socket, req) => {
         const getRoom = roomsMap.get(payload.roomId);
         const getSocketMap = getRoom?.getUsers();
         getSocketMap?.forEach((value, key) => {
-            if (value.userSocket != socket) {
+            if (value.getSocket() != socket) {
                 socket.send(JSON.stringify(payload.message));
             }
         });

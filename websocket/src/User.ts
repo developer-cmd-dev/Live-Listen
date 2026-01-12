@@ -6,13 +6,20 @@ class User{
     public email:string;
     public accessToken:string;
     public isVerified:boolean=false;
-    public userSocket:any;
-    constructor(userId:number,email:string,accessToken:string,isVerified:boolean,socket:WebSocket){
+    private userSocket:any;
+    constructor(userId:number,email:string,accessToken:string,isVerified:boolean){
         this.userId=userId;
         this.email=email;
         this.accessToken=accessToken;
         this.isVerified=isVerified
-        this.userSocket=socket;
+        
+    }
+
+    setUserSocket(socket:WebSocket){
+        this.userSocket=socket
+    }
+    getSocket(){
+        return this.userSocket;
     }
 }
 

@@ -34,6 +34,27 @@ class Room{
     getUsers(){return this.users};
     getRoomId(){return this.roomId};
     
+    toJson() {
+        return {
+            roomId: this.roomId,
+            email: this.email,
+            userId: this.userId,
+            roomName: this.roomName,
+            enabledChat: this.enabledChat,
+            isPrivate: this.isPrivate,
+            userLimit: this.userLimit,
+            users: Object.fromEntries(
+                Array.from(this.users.entries()).map(([userId, user]) => [
+                    userId,
+                    {
+                        userId: user.userId,
+                        email: user.email,
+                        isVerified: user.isVerified
+                    }
+                ])
+            )
+        }
+    }
 
 }
 

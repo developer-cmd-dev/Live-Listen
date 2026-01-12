@@ -11,11 +11,17 @@ import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
 import Chat from "@/components/Chat"
 import { motion } from 'motion/react'
 import { w3cwebsocket } from 'websocket'
-import type { SocketConnection } from "@/types/types"
+import type { CreatedRoomResponse, SocketConnection } from "@/types/types"
 import { Ghost, Music3, User, User2, Users } from "lucide-react"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 import { Button } from "@/components/ui/button"
 import VinylIcon from "@/components/ui/vinyl-icon"
+import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
+import { Input } from "@/components/ui/input"
+import { Label } from "@radix-ui/react-label"
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog"
+import { DialogHeader } from "@/components/ui/dialog"
+import CreateRoom from "@/components/CreateRoom"
 
 export default function Dashboard() {
     const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
@@ -65,10 +71,6 @@ export default function Dashboard() {
                 }
             }
         })()
-
-        return () => {
-            console.log('dashboard unmount')
-        }
 
 
     }, [socket])
@@ -129,8 +131,13 @@ export default function Dashboard() {
     const createRoom = async () => {
         try {
 
+            socket.send(JSON.stringify({ type: 'create', data: { roomName: "My room", isPrivate: true, enabledChat: true, userLimit: 3 } }));
+            socket.onmessage = (data) => {
+                const response: CreatedRoomResponse = JSON.parse(data.data.toString()) as CreatedRoomResponse;
+                console.log(response.data)
+            }
         } catch (error) {
-
+            console.log(error)
         }
 
     }
@@ -199,10 +206,11 @@ export default function Dashboard() {
                         >
 
                             <div className=" w-full h-15 border-b flex items-center  px-4 gap-5">
-                               <VinylIcon size={35}/>
+                                <VinylIcon size={35} />
                                 <h1 >Listen Together</h1>
                             </div>
 
+                            {/* <CreateRoom/> */}
 
                             <div className="col-span-1  lg:col-span-2 row-span-1  flex justify-center items-center h-145">
                                 <div className="flex flex-col px-5 items-center justify-center w-full gap-7  ">
@@ -217,7 +225,9 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className="w-full flex items-center justify-center gap-3">
-                                        <Button>
+
+
+                                        <Button onClick={createRoom}>
                                             Create Room
                                         </Button>
 
@@ -285,7 +295,7 @@ export interface Songs {
     updatedAt: string;
 }
 
-const ablumArray = [
+export const ablumArray = [
     {
         id: 1,
         imageUrl: "https://i.pinimg.com/736x/a9/44/89/a944896af0b216796ae695e7bdb7cfab.jpg"
