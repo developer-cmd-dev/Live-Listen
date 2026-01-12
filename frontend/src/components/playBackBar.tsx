@@ -1,18 +1,18 @@
 import { useActionState, useEffect, useRef, useState, type ChangeEvent } from "react"
 import { Button } from "./ui/button"
 import { Slider } from "./ui/slider"
-import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2, Palette, Currency, Pause, StepForward } from "lucide-react"
+import { Shuffle, ChevronFirst, ChevronLast, Play, Repeat, Volume2, Palette, Currency, Pause, StepForward, NonBinary } from "lucide-react"
 import { useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
 import { Progress } from "./ui/progress"
 import { Input } from "./ui/input"
 
 type Props = {
-  nextSong:()=>void;
-  previousSong:()=>void;
+  nextSong: () => void;
+  previousSong: () => void;
 }
 
 
-function PlayBackBar({nextSong,previousSong}:Props) {
+function PlayBackBar({ nextSong, previousSong }: Props) {
 
 
 
@@ -128,94 +128,81 @@ function PlayBackBar({nextSong,previousSong}:Props) {
     song ? (
       <>
 
-        <div className="  flex   gap-2 flex-1 h-[70%]">
-
-
-          <section className="  h-full flex-1/2">
-            <img className="w-96 h-48 object-cover rounded-xl border-none" src={song?.image} alt="Non" />
-
-
-
-          </section>
-          <section className="h-full w-[260px] min-w-0 p-4 flex flex-col justify-center gap-2 overflow-hidden">
-            <h1 className="text-2xl sm:text-3xl font-medium font-[cursive] truncate">
-              {song?.name}
-            </h1>
-
-            <p className="text-base sm:text-lg text-white/60 truncate">
-              {song?.artist_name}
-            </p>
-
-            <p className="text-sm sm:text-base text-white/40 truncate">
-              {song?.album_name}
-            </p>
-
-            <div className="flex items-center gap-3 mt-2 text-sm text-white/50">
-              <span>{((song?.duration || 0) / 60).toFixed(2)}</span>
-            </div>
-          </section>
-
-
-
-        </div>
-
-        <div className=" h-full flex  flex-col justify-around gap-3">
-
-          {/* Progress bar */}
-          <div className="flex  items-center gap-3 text-xs  text-white/60">
-            <Input
-              max={duration}
-              value={currentTime}
-              type="range"
-              onChange={handleSeek}
+        <div className="w-full h-full flex items-center gap-6  rounded-xl shadow-lg">
+          {/* Left: Song Info */}
+          <div className="flex  items-center min-w-0 flex-1 max-w-[350px]">
+            <img
+              className="w-16 h-16 object-cover rounded-md mr-3 shadow"
+              src={song?.image}
+              alt={song?.name ?? "cover"}
             />
+            <div className="min-w-0 flex flex-col justify-center overflow-hidden">
+              <h1 className="text-base sm:text-lg font-semibold text-white truncate">{song?.name}</h1>
+              <p className="text-sm text-white/70 truncate">{song?.artist_name}</p>
+              <p className="text-xs text-white/50 truncate">{song?.album_name}</p>
+            </div>
           </div>
 
-
-
-          {/* Controls */}
-          <div className="flex items-center  justify-between">
-
-            {/* Left menu */}
-            <div className="flex items-center gap-4 text-white/70">
-              <Button variant={"default"}><Shuffle /></Button>
-              <Button variant={"default"}><Repeat /></Button>
-
+          {/* Center: Main Controls & Progress */}
+          <div className="flex  flex-col h-full gap-2  justify-center items-center flex-1 min-w-0">
+             {/* Progress Bar */}
+             <div className="flex justify-center items-center gap-2 w-full ">
+              <span className="text-xs text-white/60 tabular-nums min-w-[40px] text-right">
+                {new Date(currentTime * 1000).toISOString().substr(currentTime >= 3600 ? 11 : 14, currentTime >= 3600 ? 8 : 5)}
+              </span>
+              <Input
+                min={0}
+                max={duration}
+                value={currentTime}
+                type="range"
+                step={1}
+                onChange={handleSeek}
+                className="flex-1  accent-green-500 h-1  bg-white/20"
+                style={{ minWidth: 64, maxWidth: 800 }}
+              />
+              <span className="text-xs text-white/60 tabular-nums min-w-[40px] text-left">
+                {new Date(duration * 1000).toISOString().substr(duration >= 3600 ? 11 : 14, duration >= 3600 ? 8 : 5)}
+              </span>
             </div>
-
-            {/* Main controls */}
-            <div className="flex items-center gap-5">
-              <Button
-              onClick={previousSong}
-                variant={"default"}
-                title="previous"
+            {/* Controls */}
+            <div className="flex  items-center w justify-center gap-2">
+              <Button variant={"ghost"} size="icon" className="!p-1 !rounded-full"><Shuffle size={18} className="opacity-60" /></Button>
+              <Button variant={"ghost"} size="icon" className="!p-1 !rounded-full"
+                onClick={previousSong}
+                title="Previous"
               >
-                <ChevronFirst />
+                <ChevronFirst size={24} />
               </Button>
               <Button
                 onClick={handlePlayPause}
                 variant={"default"}
-                title="play/pause"
+                size="icon"
+                title="Play/Pause"
+                className="!p-3 !rounded-full bg-white text-black hover:bg-white/80 transition"
               >
-                {isPlaying ? <Pause /> : <Play />}
+                {isPlaying ? <Pause size={28} /> : <Play size={28} />}
               </Button>
-              <Button onClick={nextSong} title="next" variant={"default"}><ChevronLast /></Button>
+              <Button onClick={nextSong} title="Next" variant={"ghost"} size="icon" className="!p-1 !rounded-full">
+                <ChevronLast size={24} />
+              </Button>
+              <Button variant={"ghost"} size="icon" className="!p-1 !rounded-full"><Repeat size={18} className="opacity-60" /></Button>
             </div>
+           
+          </div>
 
-            {/* Right menu */}
-            <div className="flex items-center gap-4 w-[7vw]  text-white/70">
-              <Input
-                type="range"
-                onChange={handleVolume}
-                defaultValue={2}
-                max={2}
-                step={0.1}
-                title="volume" />
-
-              <Volume2 size={40} />
-
-            </div>
-
+          {/* Right: Volume */}
+          <div className="flex  items-center flex-1 max-w-[180px] justify-end">
+            <Volume2 size={24} className="text-white/70 mr-2" />
+            <Input
+              type="range"
+              onChange={handleVolume}
+              value={volume}
+              min={0}
+              max={2}
+              step={0.01}
+              title="Volume"
+              className="accent-green-500 h-1 w-24 bg-white/20"
+            />
           </div>
         </div>
 

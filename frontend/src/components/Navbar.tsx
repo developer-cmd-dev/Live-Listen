@@ -8,11 +8,12 @@ import { toast } from 'sonner'
 
 function Navbar() {
 
-    const {userData,setUserData} = useAuthentication((state)=>state)
+    const {setUserData,setIsLoggedIn} = useAuthentication((state)=>state)
     const navigate = useNavigate();
 
     const handleLogout = ()=>{
         setUserData(null);
+        setIsLoggedIn(false);
         localStorage.removeItem('access-token');
         navigate('/login');
         

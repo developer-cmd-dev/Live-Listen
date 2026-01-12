@@ -12,8 +12,6 @@ import googleAuthMiddleware from "../middleware/googleAuthMiddleware.js";
 
 const route = Router();
 
-
-
 route.post("/auth/signup", createUser);
 route.post("/auth/login", authMiddleware, login);
 route.post("/auth/refresh", refreshToken);

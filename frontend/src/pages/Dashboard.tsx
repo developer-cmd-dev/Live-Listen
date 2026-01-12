@@ -12,6 +12,10 @@ import Chat from "@/components/Chat"
 import { motion } from 'motion/react'
 import { w3cwebsocket } from 'websocket'
 import type { SocketConnection } from "@/types/types"
+import { Ghost, Music3, User, User2, Users } from "lucide-react"
+import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
+import { Button } from "@/components/ui/button"
+import VinylIcon from "@/components/ui/vinyl-icon"
 
 export default function Dashboard() {
     const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
@@ -52,17 +56,21 @@ export default function Dashboard() {
                     }
                 }
 
-                socket.onopen = ()=>{
+                socket.onopen = () => {
                     socket.send(JSON.stringify(data));
                 }
-                socket.onmessage = (data:any) => {
+                socket.onmessage = (data: any) => {
                     const success = JSON.parse(data.data as string) as SocketConnection;
-                    if(!success.success) toast.error(success.message);
+                    if (!success.success) toast.error(success.message);
                 }
             }
         })()
 
- 
+        return () => {
+            console.log('dashboard unmount')
+        }
+
+
     }, [socket])
 
 
@@ -119,11 +127,11 @@ export default function Dashboard() {
 
 
     const createRoom = async () => {
-    try {
-        
-    } catch (error) {
-        
-    }
+        try {
+
+        } catch (error) {
+
+        }
 
     }
 
@@ -135,70 +143,105 @@ export default function Dashboard() {
 
     return (
         <div className="h-screen flex flex-col">
-            {/* Header */}
-            <Navbar />
+
 
             {/* Main */}
             <main className="flex-1 flex flex-col md:flex-col lg:flex-row gap-4 justify-center overflow-hidden p-3 ">
-                <div className="w-full lg:flex-[2] h-full rounded-md overflow-auto bg-input/10 p-4 sm:p-5 space-y-6">
-
-                    {/* Albums */}
-                    <section className="space-y-4">
-                        <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
-                            Albums
-                        </h1>
-
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                            {
-                                ablumArray.map((albums) => (
-                                    <div key={albums.id} className={`w-55  aspect-square rounded-xl  bg-center bg-no-repeat bg-cover`}
-                                        style={{
-                                            backgroundImage: `url(${albums.imageUrl})`
-                                        }}>
-
-                                    </div>
-                                ))
-                            }
-
-                        </div>
-                    </section>
-
-                    <section className="flex flex-col flex-1 space-y-4 min-h-0">
-                        <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
-                            Songs
-                        </h1>
-
-                        <div className="flex-1 overflow-auto flex flex-col gap-3">
-
-                            {songs?.length > 0 ? songs?.map((songs) => (
-                                <SongsRow
-                                    activeSong={activeSong}
-                                    playSongs={playSong}
-                                    key={songs.id}
-                                    songs={songs}
-                                />
-                            )) : skeletonArray.map((data) => (<SongRowSkeleton key={data} />))}
-                        </div>
-                    </section>
-                </div>
-
-
-
-                <div className="w-full  lg:flex-1 h-full rounded-xl  bg-none flex flex-col gap-4 ">
-                    {
-                        !isRoomCreated && <div className="bg-input/30  flex-1 flex flex-col h-72   rounded-xl backdrop-blur-md p-4 ">
-                            <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
-                        </div>
-                    }
-
-                    <motion.div
-                        className="bg-input/30 flex-1 p-3 bg-center bg-cover bg-no-repeat rounded-xl backdrop-blur-md"
-                        initial={{ height: '18rem' }}
-                        animate={{ height: isRoomCreated ? '32rem' : '18rem' }}
-                        transition={{ type: "spring", stiffness: 200, damping: 25 }}
+                <div className="grid grid-cols-1 lg:grid-cols-10 grid-rows-[1fr_auto] gap-4 w-full h-full flex-1">
+                    <div
+                        className="col-span-1 lg:col-span-8 row-span-1 h-full rounded-md overflow-auto bg-input/17 p-4 sm:p-5 space-y-6 custom-scrollbar"
+                        style={{
+                            scrollbarColor: "#222  #111",
+                        }}
                     >
-                        {!isRoomCreated ? <RoomAccess handleRoomCreate={createRoom} /> : <Chat socket={socket} roomId={roomId} handleRoomCreate={handleRoomCreate} />}
-                    </motion.div>
+                        <section className="space-y-4">
+                            <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
+                                Albums
+                            </h1>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                                {
+                                    ablumArray.map((albums) => (
+                                        <div key={albums.id} className={`w-68 aspect-square rounded-xl bg-center bg-no-repeat bg-cover`}
+                                            style={{
+                                                backgroundImage: `url(${albums.imageUrl})`
+                                            }}>
+                                        </div>
+                                    ))
+                                }
+                            </div>
+                        </section>
+                        <section className="flex flex-col flex-1 space-y-4 min-h-0">
+                            <h1 className="border-b pb-2 text-sm sm:text-md font-semibold tracking-tight">
+                                Songs
+                            </h1>
+                            <div
+                                className="flex-1 overflow-auto flex flex-col gap-3 custom-scrollbar"
+                                style={{
+                                    scrollbarColor: "#222  #111"
+                                }}
+                            >
+                                {songs?.length > 0 ? songs?.map((songs) => (
+                                    <SongsRow
+                                        activeSong={activeSong}
+                                        playSongs={playSong}
+                                        key={songs.id}
+                                        songs={songs}
+                                    />
+                                )) : skeletonArray.map((data) => (<SongRowSkeleton key={data} />))}
+                            </div>
+                        </section>
+                    </div>
+
+
+                    <div className="col-span-1 lg:col-span-2 row-span-1   h-full rounded-md bg-none flex flex-col gap-4 min-w-[260px] max-w-xs">
+                        <div
+                            className="bg-input/20 flex-1 bg-center bg-cover bg-no-repeat rounded-md  backdrop-blur-md"
+                        >
+
+                            <div className=" w-full h-15 border-b flex items-center  px-4 gap-5">
+                               <VinylIcon size={35}/>
+                                <h1 >Listen Together</h1>
+                            </div>
+
+
+                            <div className="col-span-1  lg:col-span-2 row-span-1  flex justify-center items-center h-145">
+                                <div className="flex flex-col px-5 items-center justify-center w-full gap-7  ">
+                                    <div className="w-full flex-col gap-1 flex items-center justify-center">
+
+                                        <h2 className="relative z-10 mx-auto max-w-4xl text-center text-2xl font-bold text-neutral-800 md:text-4xl lg:text-5xl dark:text-neutral-100">
+                                            Listen Together
+                                        </h2>
+                                        <p className="relative z-10 mx-auto mt-4 max-w-xl text-center text-neutral-800 dark:text-neutral-500 text-sm">
+                                            Bring your friends together to enjoy your favorite songs in real-time. Create or join a room and listen to music together, chat live, and share the experience. Start a musical journey—because listening is always better with friends!
+                                        </p>
+                                    </div>
+
+                                    <div className="w-full flex items-center justify-center gap-3">
+                                        <Button>
+                                            Create Room
+                                        </Button>
+
+                                        <Button variant={"outline"}>
+                                            Join Room
+                                        </Button>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                            {/* {!isRoomCreated ? <RoomAccess handleRoomCreate={createRoom} /> : <Chat socket={socket} roomId={roomId} handleRoomCreate={handleRoomCreate} />} */}
+                        </div>
+                    </div>
+
+                    <div className="col-span-1 lg:col-span-10 row-span-1 px">
+                        {
+                            !isRoomCreated && <div className="bg-input/20 px-3 flex flex-col h-24 rounded-md ">
+                                <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
+                            </div>
+                        }
+                    </div>
                 </div>
             </main>
 
@@ -212,7 +255,7 @@ export default function Dashboard() {
 export interface Songs {
     id: number;
     name: string;
-    duration: number; 
+    duration: number;
 
     artist_id: string;
     artist_name: string;
