@@ -1,1 +1,1 @@
-{"root":["./src/JWT.ts","./src/Response.ts","./src/Room.ts","./src/User.ts","./src/index.ts"],"version":"5.9.3"}
+{"root":["./src/JWT.ts","./src/Response.ts","./src/Room.ts","./src/User.ts","./src/index.ts","./src/types/types.ts"],"version":"5.9.3"}

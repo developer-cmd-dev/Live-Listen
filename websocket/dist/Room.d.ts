@@ -25,7 +25,7 @@ declare class Room {
             userId: number;
             email: string;
             isVerified: boolean;
-        }[][];
+        }[];
     };
 }
 export default Room;

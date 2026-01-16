@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { type Songs } from '@/pages/Dashboard'
-import type { UserAuthPayload } from '@/types/types';
+import {  type RoomType, type UserAuthPayload } from '@/types/types';
 
 type SongStore={
     song:Songs|null;
@@ -24,7 +24,7 @@ type IsPlaying = {
 interface Authentication {
     userData:UserAuthPayload|null;
     isLoggedIn:boolean;
-    setUserData:(data:UserAuthPayload|null)=>void;
+    setUserData:(data:UserAuthPayload)=>void;
     setIsLoggedIn:(data:boolean)=>void;
 }
 
@@ -55,7 +55,18 @@ const useAuthentication= create<Authentication>((set)=>({
     setIsLoggedIn:(data:boolean)=>set({isLoggedIn:data})
 }))
 
+interface CreatedRoomDataState{
+    roomData:RoomType|null;
+    setRoomData:(data:RoomType)=>void;
+}
+
+
+const useRoomState = create<CreatedRoomDataState>((set)=>({
+   roomData:null,
+   setRoomData:((data:RoomType)=>set({roomData:data}))
+}))
 
 
 
-export { useSongState,useHandleCurrentSong,useIsPlaying,useAuthentication};
+
+export { useSongState,useHandleCurrentSong,useIsPlaying,useAuthentication,useRoomState};

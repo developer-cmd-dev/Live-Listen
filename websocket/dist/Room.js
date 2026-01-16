@@ -35,13 +35,11 @@ class Room {
             enabledChat: this.enabledChat,
             isPrivate: this.isPrivate,
             userLimit: this.userLimit,
-            users: Array.from(this.users.entries()).map(([userId, user]) => [
-                {
-                    userId: user.userId,
-                    email: user.email,
-                    isVerified: user.isVerified
-                }
-            ])
+            users: Array.from(this.users.entries()).map(([userId, user]) => ({
+                userId: user.userId,
+                email: user.email,
+                isVerified: user.isVerified
+            }))
         };
     }
 }

@@ -9,7 +9,7 @@ import { json } from 'stream/consumers';
 import { config } from 'dotenv';
 import JWT from './JWT.js';
 import { randomUUID } from 'crypto';
-
+import type{ CloseConnectionType } from './types/types.js';
 config();
 let roomsMap = new Map<number, Room>();
 
@@ -17,7 +17,7 @@ let roomsMap = new Map<number, Room>();
 
 type Type = "connect" | "create" | "join" | "message"
 
-interface ConnectWebSocketQuery {
+export interface ConnectWebSocketQuery {
     type: Type;
     data: object;
 }
@@ -26,6 +26,7 @@ interface UserPayload {
     email: string;
     userId: number;
     accessToken: string;
+    roomId:number;
 }
 
 interface RoomCreatePayload {
@@ -61,7 +62,8 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true);
         userData.setUserSocket(socket);
         console.log("Connected with ", userPayload.email)
-        socket.send(JSON.stringify(new Response(true, "Websocket connected", null)))
+        const getRoom = roomsMap.get(userPayload.roomId)
+        socket.send(JSON.stringify(new Response(true, "Websocket connected",{...getRoom?.toJson()})))
     }
 
     const handleCreate = (data: any) => {
@@ -71,7 +73,7 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
             const room = new Room(roomId, userData.email, userData.userId, roomName, enabledChat, isPrivate, userLimit)
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
-            socket.send(JSON.stringify(new Response(true, "Room created", { data: room.toJson() })))
+            socket.send(JSON.stringify(new Response(true, "Room created", {...room.toJson(),roomType:'create'})))
             console.log(`Room created by ${userData.email} with ${roomId}`)
 
         } else {
@@ -104,11 +106,27 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
     }
 
 
+    const handleClose = (data:any)=>{
+        const closeConnectionPayload = data as CloseConnectionType;
+        console.log(closeConnectionPayload.data)
+        // if(closeConnectionPayload.data.roomType=="create"){
+        //     roomsMap.delete(closeConnectionPayload.data.roomId);
+        //     console.log(roomsMap)
+        // }else if(closeConnectionPayload.data.roomType=="join"){
+        //   const getRoom=  roomsMap.get(closeConnectionPayload.data.roomId);
+        //     getRoom?.destroyUser(closeConnectionPayload.data.userId);
+        //     socket.send(JSON.stringify(new Response(true,"success",{...getRoom?.toJson()})));
+        // }
+        
+    }
+
+
     const handlers = {
         connect: handleConnect,
         create: handleCreate,
         join: handleJoin,
-        message: handleMessage
+        message: handleMessage,
+        close:handleClose
     }
 
 
@@ -122,7 +140,7 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         }
     })
 
-    socket.on('close',()=>{
+    socket.on('close',(data)=>{
         console.log('socket disconnected')
     })
 

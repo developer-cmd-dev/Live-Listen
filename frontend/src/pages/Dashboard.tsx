@@ -5,14 +5,14 @@ import SongRowSkeleton from "@/components/SongRowSkeleton"
 import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
-import { useAuthentication, useHandleCurrentSong, useIsPlaying, useSongState } from "@/store/zustand"
+import { useAuthentication, useHandleCurrentSong, useIsPlaying, useRoomState, useSongState } from "@/store/zustand"
 import Navbar from "@/components/Navbar"
 import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
 import Chat from "@/components/Chat"
 import { motion } from 'motion/react'
 import { w3cwebsocket } from 'websocket'
-import type { CreatedRoomResponse, SocketConnection } from "@/types/types"
-import { Ghost, Music3, User, User2, Users } from "lucide-react"
+import type { CreatedRoomResponse, RoomType, SocketConnection } from "@/types/types"
+import { FastForward, Ghost, Music3, User, User2, Users } from "lucide-react"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 import { Button } from "@/components/ui/button"
 import VinylIcon from "@/components/ui/vinyl-icon"
@@ -22,6 +22,7 @@ import { Label } from "@radix-ui/react-label"
 import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog"
 import { DialogHeader } from "@/components/ui/dialog"
 import CreateRoom from "@/components/CreateRoom"
+import { useSocket } from "@/hooks/useSocket"
 
 export default function Dashboard() {
     const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
@@ -30,7 +31,8 @@ export default function Dashboard() {
 
     const { userData } = useAuthentication((state) => state)
     const [roomId, setRoomId] = useState<number | null>(null)
-    const socket = new w3cwebsocket(webSocketUrl);
+    const socket = useSocket(webSocketUrl);
+    const { setRoomData,roomData } = useRoomState((state) => state);
 
 
 
@@ -50,30 +52,33 @@ export default function Dashboard() {
     }, [])
 
     useEffect(() => {
-        (async () => {
-            if (socket && userData) {
-                const accessToken = localStorage.getItem('access-token');
+
+            if(!socket|| userData==null||socket.readyState !== WebSocket.OPEN) return;
+      
+            const accessToken = localStorage.getItem('access-token');
+            const getLastCreatedRoomId=localStorage.getItem("last-created-roomid");
                 const data = {
                     type: "connect",
                     data: {
                         email: userData?.email,
                         userId: userData?.id,
-                        accessToken: accessToken
+                        accessToken: accessToken,
+                        roomId:Number(getLastCreatedRoomId)
                     }
                 }
 
-                socket.onopen = () => {
-                    socket.send(JSON.stringify(data));
-                }
+                socket.send(JSON.stringify(data));
                 socket.onmessage = (data: any) => {
                     const success = JSON.parse(data.data as string) as SocketConnection;
+                    const roomData:RoomType = success.data as RoomType;
+                    setRoomData(roomData);
+                    setIsRoomCreated(true)
                     if (!success.success) toast.error(success.message);
                 }
-            }
-        })()
 
+             
 
-    }, [socket])
+    }, [socket,userData])
 
 
 
@@ -133,8 +138,10 @@ export default function Dashboard() {
 
             socket.send(JSON.stringify({ type: 'create', data: { roomName: "My room", isPrivate: true, enabledChat: true, userLimit: 3 } }));
             socket.onmessage = (data) => {
-                const response: CreatedRoomResponse = JSON.parse(data.data.toString()) as CreatedRoomResponse;
-                console.log(response.data)
+                const response = JSON.parse(data.data.toString()) ;
+                localStorage.setItem("last-created-roomid",response.data.roomId);
+                setRoomData(response.data);
+                setIsRoomCreated(true)
             }
         } catch (error) {
             console.log(error)
@@ -142,6 +149,14 @@ export default function Dashboard() {
 
     }
 
+
+    const exitRoom = ()=>{
+       socket.send(JSON.stringify({ type: 'close', data: { roomId: roomData?.roomId, userId: userData?.id, roomType:roomData?.roomType} }));
+
+       socket.onmessage=(data)=>{
+        console.log(data.data)
+       }
+    }
 
 
 
@@ -210,9 +225,7 @@ export default function Dashboard() {
                                 <h1 >Listen Together</h1>
                             </div>
 
-                            {/* <CreateRoom/> */}
-
-                            <div className="col-span-1  lg:col-span-2 row-span-1  flex justify-center items-center h-145">
+                            {!isRoomCreated  ? (<div className="col-span-1  lg:col-span-2 row-span-1  flex justify-center items-center h-145">
                                 <div className="flex flex-col px-5 items-center justify-center w-full gap-7  ">
                                     <div className="w-full flex-col gap-1 flex items-center justify-center">
 
@@ -238,19 +251,17 @@ export default function Dashboard() {
 
                                 </div>
                             </div>
+                            ) : <CreateRoom exitRoom={exitRoom} />}
 
 
-
-                            {/* {!isRoomCreated ? <RoomAccess handleRoomCreate={createRoom} /> : <Chat socket={socket} roomId={roomId} handleRoomCreate={handleRoomCreate} />} */}
                         </div>
                     </div>
 
                     <div className="col-span-1 lg:col-span-10 row-span-1 px">
-                        {
-                            !isRoomCreated && <div className="bg-input/20 px-3 flex flex-col h-24 rounded-md ">
-                                <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
-                            </div>
-                        }
+                        <div className="bg-input/20 px-3 flex flex-col h-24 rounded-md ">
+                            <PlayBackBar nextSong={nextSong} previousSong={previousSong} />
+                        </div>
+
                     </div>
                 </div>
             </main>

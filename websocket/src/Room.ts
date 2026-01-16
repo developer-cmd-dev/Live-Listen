@@ -44,13 +44,11 @@ class Room{
             isPrivate: this.isPrivate,
             userLimit: this.userLimit,
             users: 
-                Array.from(this.users.entries()).map(([userId, user]) => [
-                    {
-                        userId: user.userId,
-                        email: user.email,
-                        isVerified: user.isVerified
-                    }
-                ])
+                Array.from(this.users.entries()).map(([userId, user]) => ({
+                    userId: user.userId,
+                    email: user.email,
+                    isVerified: user.isVerified
+                }))
             
         }
     }
