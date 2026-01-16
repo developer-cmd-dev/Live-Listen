@@ -22,9 +22,14 @@ wss.on('connection', (socket, req) => {
             socket.send(JSON.stringify(new Response(false, "Invalid Credential", null)));
         userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true);
         userData.setUserSocket(socket);
-        console.log("Connected with ", userPayload.email);
         const getRoom = roomsMap.get(userPayload.roomId);
-        socket.send(JSON.stringify(new Response(true, "Websocket connected", { ...getRoom?.toJson() })));
+        if (!getRoom) {
+            socket.send(JSON.stringify(new Response(true, "Websocket connected", null)));
+        }
+        else {
+            socket.send(JSON.stringify(new Response(true, "Websocket connected", { ...getRoom?.toJson() })));
+        }
+        console.log("Connected with ", userPayload.email);
     };
     const handleCreate = (data) => {
         const { roomName, isPrivate, enabledChat, userLimit } = data;
@@ -61,16 +66,15 @@ wss.on('connection', (socket, req) => {
         });
     };
     const handleClose = (data) => {
-        const closeConnectionPayload = data;
-        console.log(closeConnectionPayload.data);
-        // if(closeConnectionPayload.data.roomType=="create"){
-        //     roomsMap.delete(closeConnectionPayload.data.roomId);
-        //     console.log(roomsMap)
-        // }else if(closeConnectionPayload.data.roomType=="join"){
-        //   const getRoom=  roomsMap.get(closeConnectionPayload.data.roomId);
-        //     getRoom?.destroyUser(closeConnectionPayload.data.userId);
-        //     socket.send(JSON.stringify(new Response(true,"success",{...getRoom?.toJson()})));
-        // }
+        const { roomId, userId, roomType } = data;
+        if (roomType == "create") {
+            roomsMap.delete(roomId);
+        }
+        else if (roomType == "join") {
+            const getRoom = roomsMap.get(roomId);
+            getRoom?.destroyUser(userId);
+            socket.send(JSON.stringify(new Response(true, "success", { ...getRoom?.toJson() })));
+        }
     };
     const handlers = {
         connect: handleConnect,

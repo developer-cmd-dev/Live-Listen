@@ -1,9 +1,6 @@
-import type { ConnectWebSocketQuery } from '../index.js';
-export interface CloseConnectionType extends ConnectWebSocketQuery {
-    data: {
-        userId: number;
-        roomType: "join" | "create";
-        roomId: number;
-    };
+export interface CloseConnectionType {
+    userId: number;
+    roomType: "join" | "create";
+    roomId: number;
 }
 //# sourceMappingURL=types.d.ts.map

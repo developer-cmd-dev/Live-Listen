@@ -70,15 +70,20 @@ export default function Dashboard() {
                 socket.send(JSON.stringify(data));
                 socket.onmessage = (data: any) => {
                     const success = JSON.parse(data.data as string) as SocketConnection;
-                    const roomData:RoomType = success.data as RoomType;
+                    const roomData:RoomType|null= success.data as RoomType;
+                    if(!roomData){
+                        setIsRoomCreated(false);
+                    }else{
                     setRoomData(roomData);
                     setIsRoomCreated(true)
+                    }
+                    
                     if (!success.success) toast.error(success.message);
                 }
 
              
 
-    }, [socket,userData])
+    }, [socket])
 
 
 
@@ -151,6 +156,8 @@ export default function Dashboard() {
 
 
     const exitRoom = ()=>{
+        setIsRoomCreated(false);
+        console.log(roomData)
        socket.send(JSON.stringify({ type: 'close', data: { roomId: roomData?.roomId, userId: userData?.id, roomType:roomData?.roomType} }));
 
        socket.onmessage=(data)=>{
