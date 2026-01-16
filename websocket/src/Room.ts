@@ -5,22 +5,28 @@ class Room{
 
     private roomId:number;
      email:string;
+     username:string;
      userId:number;
      roomName:string|undefined;
-     enabledChat:boolean;
-     isPrivate:boolean;
      userLimit:number;
      users=new Map<number,User>();
     
 
-    constructor(roomId:number,email:string,userId:number,roomName:string|undefined,enabledChat:boolean,isPrivate:boolean,userLimit:number){
-        this.roomId=roomId;
-        this.email=email;
-        this.userId=userId;
-        this.roomName=roomName;
-        this.enabledChat=enabledChat;
-        this.isPrivate=isPrivate;
-        this.userLimit=userLimit;
+    constructor(
+        roomId: number,
+        email: string,
+        username:string,
+        userId: number,
+        roomName: string | undefined,
+        userLimit: number,
+    ) {
+        this.roomId = roomId;
+        this.email = email;
+        this.userId = userId;
+        this.roomName = roomName;
+        this.userLimit = userLimit;
+        this.username=username;
+
     }
 
     setUser(user:User,userId:number){
@@ -40,8 +46,6 @@ class Room{
             email: this.email,
             userId: this.userId,
             roomName: this.roomName,
-            enabledChat: this.enabledChat,
-            isPrivate: this.isPrivate,
             userLimit: this.userLimit,
             users: 
                 Array.from(this.users.entries()).map(([userId, user]) => ({

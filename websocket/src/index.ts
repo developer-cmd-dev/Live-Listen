@@ -9,7 +9,7 @@ import { json } from 'stream/consumers';
 import { config } from 'dotenv';
 import JWT from './JWT.js';
 import { randomUUID } from 'crypto';
-import type{ CloseConnectionType } from './types/types.js';
+import type{ CloseConnectionType, RoomCreatePayload } from './types/types.js';
 config();
 let roomsMap = new Map<number, Room>();
 
@@ -29,12 +29,7 @@ interface UserPayload {
     roomId:number;
 }
 
-interface RoomCreatePayload {
-    roomName?: string;
-    enabledChat: boolean;
-    isPrivate: false;
-    userLimit: number;
-}
+
 
 interface Message {
     roomId: number;
@@ -72,10 +67,10 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
     }
 
     const handleCreate = (data: any) => {
-        const { roomName, isPrivate, enabledChat, userLimit } = data as RoomCreatePayload;
+        const { roomName,  userLimit,usename } = data as RoomCreatePayload;
         const roomId = Math.floor(Math.random() * 10000);
         if (!roomsMap.has(roomId)) {
-            const room = new Room(roomId, userData.email, userData.userId, roomName, enabledChat, isPrivate, userLimit)
+            const room = new Room(roomId, userData.email, usename,userData.userId, roomName,userLimit);
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
             socket.send(JSON.stringify(new Response(true, "Room created", {...room.toJson(),roomType:'create'})))
@@ -92,7 +87,8 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         const getRoom = roomsMap.get(joinPayload.roomId);
         if (!getRoom) socket.send(JSON.stringify(new Response(false, "Room has expired", null)));
         getRoom?.setUser(userData, userData.userId);
-        socket.send(JSON.stringify(new Response(true, "Joined Room", null)));
+        socket.send(JSON.stringify(new Response(true, "Joined Room", {...getRoom?.toJson(),roomType:'join'})));
+        console.log(userData.email+ " has joined in the room - "+joinPayload.roomId)
     }
 
     const handleMessage = (data: any) => {

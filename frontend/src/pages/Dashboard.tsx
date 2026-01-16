@@ -11,7 +11,7 @@ import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
 import Chat from "@/components/Chat"
 import { motion } from 'motion/react'
 import { w3cwebsocket } from 'websocket'
-import type { CreatedRoomResponse, RoomType, SocketConnection } from "@/types/types"
+import type { CreatedRoomResponse, CreateRoomData, RoomType, SocketConnection } from "@/types/types"
 import { FastForward, Ghost, Music3, User, User2, Users } from "lucide-react"
 import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
 import { Button } from "@/components/ui/button"
@@ -23,6 +23,7 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } 
 import { DialogHeader } from "@/components/ui/dialog"
 import CreateRoom from "@/components/CreateRoom"
 import { useSocket } from "@/hooks/useSocket"
+import CreateRoomDialog from "@/components/CreateRoomDialog"
 
 export default function Dashboard() {
     const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
@@ -138,10 +139,10 @@ export default function Dashboard() {
 
 
 
-    const createRoom = async () => {
+    const createRoom = async (data:CreateRoomData) => {
+        console.log(data)
         try {
-
-            socket.send(JSON.stringify({ type: 'create', data: { roomName: "My room", isPrivate: true, enabledChat: true, userLimit: 3 } }));
+            socket.send(JSON.stringify({ type: 'create', data: data }));
             socket.onmessage = (data) => {
                 const response = JSON.parse(data.data.toString()) ;
                 localStorage.setItem("last-created-roomid",response.data.roomId);
@@ -244,13 +245,8 @@ export default function Dashboard() {
                                         </p>
                                     </div>
 
-                                    <div className="w-full flex items-center justify-center gap-3">
-
-
-                                        <Button onClick={createRoom}>
-                                            Create Room
-                                        </Button>
-
+                                    <div className=" w-full flex items-center justify-center gap-3">
+                                      <CreateRoomDialog handleCreate={createRoom}/>
                                         <Button variant={"outline"}>
                                             Join Room
                                         </Button>

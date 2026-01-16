@@ -6,3 +6,9 @@ export interface CloseConnectionType  {
         roomId: number;
     
 }
+
+export interface RoomCreatePayload {
+        roomName?: string;
+        userLimit: number;
+        usename:string;
+    }

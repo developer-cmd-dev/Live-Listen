@@ -7,13 +7,15 @@ export interface SocketConnection{
 
 export interface CreateRoom{
     type:string;
-    data:{
-        roomName?: string;
-        enabledChat: boolean;
-        isPrivate: false;
-        userLimit: number;
-    }
+    data:CreateRoomData
 
+}
+
+
+export interface CreateRoomData{
+    roomName?: string;
+    username:string;
+    userLimit: number;
 }
 
 
@@ -36,9 +38,8 @@ export interface RoomType {
     roomId: number;
     email: string;
     userId: number;
+    username:string;
     roomName?: string;
-    enabledChat: boolean;
-    isPrivate: boolean;
     userLimit: number;
     roomType:string;
     users:[{

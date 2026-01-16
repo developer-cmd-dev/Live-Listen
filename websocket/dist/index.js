@@ -32,10 +32,10 @@ wss.on('connection', (socket, req) => {
         console.log("Connected with ", userPayload.email);
     };
     const handleCreate = (data) => {
-        const { roomName, isPrivate, enabledChat, userLimit } = data;
+        const { roomName, userLimit, usename } = data;
         const roomId = Math.floor(Math.random() * 10000);
         if (!roomsMap.has(roomId)) {
-            const room = new Room(roomId, userData.email, userData.userId, roomName, enabledChat, isPrivate, userLimit);
+            const room = new Room(roomId, userData.email, usename, userData.userId, roomName, userLimit);
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
             socket.send(JSON.stringify(new Response(true, "Room created", { ...room.toJson(), roomType: 'create' })));
@@ -53,7 +53,8 @@ wss.on('connection', (socket, req) => {
         if (!getRoom)
             socket.send(JSON.stringify(new Response(false, "Room has expired", null)));
         getRoom?.setUser(userData, userData.userId);
-        socket.send(JSON.stringify(new Response(true, "Joined Room", null)));
+        socket.send(JSON.stringify(new Response(true, "Joined Room", { ...getRoom?.toJson(), roomType: 'join' })));
+        console.log(userData.email + " has joined in the room - " + joinPayload.roomId);
     };
     const handleMessage = (data) => {
         const payload = data;
