@@ -7,7 +7,7 @@ import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
 import { useAuthentication, useHandleCurrentSong, useIsPlaying, useRoomState, useSongState } from "@/store/zustand"
 
-import type { CreatedRoomResponse, CreateRoomData, JoinRoomData, RoomType, SocketConnection, WebSocketMessageResponse } from "@/types/types"
+import type { CreatedRoomResponse, CreateRoomData, JoinRoomData, RoomDetails, WebSocketMessageResponse } from "@/types/types"
 
 import VinylIcon from "@/components/ui/vinyl-icon"
 
@@ -23,11 +23,15 @@ export default function Dashboard() {
 
     const { userData } = useAuthentication((state) => state)
     const [roomId, setRoomId] = useState<number | null>(null)
-    const {socket,connected} = useSocket(webSocketUrl);
+    const { socket, connected } = useSocket(webSocketUrl);
     const { setRoomData, roomData } = useRoomState((state) => state);
+    const setSong = useSongState((state) => state.setSong)
+    const setIsPlayCurrentSong = useHandleCurrentSong((state) => state.setIsPlayCurrentSong)
+    const { isPlaying, setIsPlaying } = useIsPlaying((state) => state);
+    const [isRoomCreated, setIsRoomCreated] = useState(false);
 
 
-
+    // get last played song cache data
     useEffect(() => {
         (async () => {
             try {
@@ -43,54 +47,13 @@ export default function Dashboard() {
         })()
     }, [])
 
-    useEffect(() => {
-        if(!connected || !socket) return;
-        console.log(socket)
-        const accessToken = localStorage.getItem('access-token');
-        const getLastCreatedRoomId = localStorage.getItem("last-created-roomid");
-        const data = {
-            type: "connect",
-            data: {
-                email: userData?.email,
-                userId: userData?.id,
-                accessToken: accessToken,
-                roomId: Number(getLastCreatedRoomId)
-            }
-        }
 
-            socket.send(JSON.stringify(data));
-
-        
-
-        socket.onmessage = (data: any) => {
-            const success = JSON.parse(data.data as string) as SocketConnection;
-            const roomData: RoomType | null = success.data as RoomType;
-            if (!roomData) {
-                setIsRoomCreated(false);
-            } else {
-                setRoomData(roomData);
-                setIsRoomCreated(true)
-            }
-
-            if (!success.success) toast.error(success.message);
-        }
-
-        
-
-
-    }, [connected])
+    // websocket connection
+    // useEffect(() => {
 
 
 
-
-    const setSong = useSongState((state) => state.setSong)
-    const setIsPlayCurrentSong = useHandleCurrentSong((state) => state.setIsPlayCurrentSong)
-    const { isPlaying, setIsPlaying } = useIsPlaying((state) => state);
-
-    const [isRoomCreated, setIsRoomCreated] = useState(false);
-
-
-
+    // }, [connected])
 
 
     const playSong = (id: number, songData: Songs) => {
@@ -130,41 +93,96 @@ export default function Dashboard() {
 
 
 
+    useEffect(() => {
+        if (!connected || !socket) return;
+        console.log(socket)
+        const accessToken = localStorage.getItem('access-token');
+        const getLastCreatedRoomId = localStorage.getItem("last-created-roomid");
+        const data = {
+            type: "connect",
+            data: {
+                email: userData?.email,
+                userId: userData?.id,
+                accessToken: accessToken,
+                roomId: Number(getLastCreatedRoomId)
+            }
+        }
+
+        socket.send(JSON.stringify(data));
+        socket.onmessage = (data: any) => {
+            const response = JSON.parse(data.data as string) as WebSocketMessageResponse;
+            if (!response.success) {
+                toast.error(response.message);
+                return;
+            }
+
+            if (response.data.type === 'connect') {
+                console.log('Socket connected');
+            } else if (response.data.type === 'create') {
+                const roomPayload = response.data.data as RoomDetails;
+                setRoomData(roomPayload);
+                localStorage.setItem("last-created-roomid", String(roomPayload.roomId));
+                setIsRoomCreated(true)
+            } else if (response.data.type === 'join') {
+                const newUserPayload = response.data.data as {
+                    user: {
+                        userId: number;
+                        email: string;
+                        isVerified: boolean;
+                    }
+                }
+                useRoomState.getState().setRoomData(((prev)=>{
+                    if(!prev) return prev;
+                    return {
+                        ...prev,
+                        users:[...prev.users,newUserPayload.user]
+                    }
+                }));
+                
+            }
+
+        }
+
+    }, [connected])
+
+
 
 
     const createRoom = async (data: CreateRoomData) => {
         try {
-            if(!socket || !connected || !userData) {
+            if (!socket || !connected || !userData) {
                 toast.error("Something went wrong!");
                 return;
             };
-            data={
+            data = {
                 ...data,
-                userId:userData?.id,
+                userId: userData?.id,
             }
             socket.send(JSON.stringify({ type: 'create', data: data }));
-            socket.onmessage = (data) => {
-                const response = JSON.parse(data.data.toString());
-                localStorage.setItem("last-created-roomid", response.data.roomId);
-                setRoomData(response.data);
-                setIsRoomCreated(true)
-            }
+            // socket.onmessage = (data) => {
+            //     const response = JSON.parse(data.data.toString()) as WebSocketMessageResponse;
+            //     if(!response.success) return;
+            //     const roomPayload = response.data as RoomType;
+
+
+            // }
         } catch (error) {
             console.log(error)
         }
 
     }
 
-    const joinRoom = async(data:any)=>{
+    const joinRoom = async (data: any) => {
         const joinPayload = data as JoinRoomData;
         console.log(joinPayload)
-        if(!socket) return;
-        socket.send(JSON.stringify({type:'join',data:joinPayload}));
+        if (!socket) return;
+        socket.send(JSON.stringify({ type: 'join', data: joinPayload }));
 
-        socket.onmessage = (data)=>{
+        socket.onmessage = (data) => {
             const messagePayload = JSON.parse(data.data.toString()) as WebSocketMessageResponse;
+            console.log(messagePayload)
             if(messagePayload.success){
-               setRoomData(messagePayload.data as RoomType)
+               setRoomData(messagePayload.data.data as RoomDetails)
                setIsRoomCreated(true);
             }
         }
@@ -178,7 +196,7 @@ export default function Dashboard() {
             userId: userData?.id,
             roomType: roomData?.roomType,
         };
-        if(!socket) return;
+        if (!socket) return;
         socket.send(JSON.stringify({ type: 'close', data: closeData }));
 
         socket.onmessage = (data) => {
@@ -268,7 +286,7 @@ export default function Dashboard() {
                                     <div className=" w-full flex items-center justify-center gap-3">
                                         <CreateRoomDialog handleCreate={createRoom} />
 
-                                        <JoinRoomDialog handleJoin={joinRoom}/>
+                                        <JoinRoomDialog handleJoin={joinRoom} />
                                     </div>
 
                                 </div>

@@ -1,72 +1,81 @@
 import { create } from 'zustand'
 import { type Songs } from '@/pages/Dashboard'
-import {  type RoomType, type UserAuthPayload } from '@/types/types';
+import { type RoomDetails, type UserAuthPayload } from '@/types/types';
 
-type SongStore={
-    song:Songs|null;
-    setSong:(song:Songs|undefined)=>void;
-} 
+type SongStore = {
+    song: Songs | null;
+    setSong: (song: Songs | undefined) => void;
+}
 
 type CurrentSong = {
-    isPlayCurrentSong:boolean;
-    setIsPlayCurrentSong:(value:boolean)=>void;
+    isPlayCurrentSong: boolean;
+    setIsPlayCurrentSong: (value: boolean) => void;
 
 }
 
 type IsPlaying = {
-    isPlaying :boolean;
-    setIsPlaying: (value:boolean)=>void;
+    isPlaying: boolean;
+    setIsPlaying: (value: boolean) => void;
 }
 
 
 
 
 interface Authentication {
-    userData:UserAuthPayload|null;
-    isLoggedIn:boolean;
-    setUserData:(data:UserAuthPayload)=>void;
-    setIsLoggedIn:(data:boolean)=>void;
+    userData: UserAuthPayload | null;
+    isLoggedIn: boolean;
+    setUserData: (data: UserAuthPayload) => void;
+    setIsLoggedIn: (data: boolean) => void;
 }
 
 
 
-const useSongState = create<SongStore>((set) =>({
-   song:null,
-   setSong:((song)=>set({song})),
-   
+const useSongState = create<SongStore>((set) => ({
+    song: null,
+    setSong: ((song) => set({ song })),
+
 }))
 
-const useHandleCurrentSong = create<CurrentSong>((set)=>({
-    isPlayCurrentSong:false,
-    setIsPlayCurrentSong:((value:boolean)=>set({isPlayCurrentSong:value}))
-}))
-
-
-const useIsPlaying = create<IsPlaying>((set)=>({
-    isPlaying:false,
-    setIsPlaying:((value:boolean)=>set({isPlaying:value}))
+const useHandleCurrentSong = create<CurrentSong>((set) => ({
+    isPlayCurrentSong: false,
+    setIsPlayCurrentSong: ((value: boolean) => set({ isPlayCurrentSong: value }))
 }))
 
 
-const useAuthentication= create<Authentication>((set)=>({
-    userData:null,
-    isLoggedIn:false,
-    setUserData:(data:UserAuthPayload)=>set({userData:data}),
-    setIsLoggedIn:(data:boolean)=>set({isLoggedIn:data})
+const useIsPlaying = create<IsPlaying>((set) => ({
+    isPlaying: false,
+    setIsPlaying: ((value: boolean) => set({ isPlaying: value }))
 }))
 
-interface CreatedRoomDataState{
-    roomData:RoomType|null;
-    setRoomData:(data:RoomType)=>void;
+
+const useAuthentication = create<Authentication>((set) => ({
+    userData: null,
+    isLoggedIn: false,
+    setUserData: (data: UserAuthPayload) => set({ userData: data }),
+    setIsLoggedIn: (data: boolean) => set({ isLoggedIn: data })
+}))
+
+interface CreatedRoomDataState {
+    roomData: RoomDetails | null;
+    setRoomData: (
+        updater: RoomDetails | ((prev: RoomDetails | null) => RoomDetails | null)
+    ) => void;
 }
 
 
-const useRoomState = create<CreatedRoomDataState>((set)=>({
-   roomData:null,
-   setRoomData:((data:RoomType)=>set({roomData:data}))
+const useRoomState = create<CreatedRoomDataState>((set) => ({
+    roomData: null,
+
+    setRoomData: (updater) =>
+        set((state) => ({
+            roomData:
+                typeof updater === "function"
+                    ? updater(state.roomData)
+                    : updater,
+        })),
 }))
 
 
 
 
-export { useSongState,useHandleCurrentSong,useIsPlaying,useAuthentication,useRoomState};
+export { useSongState, useHandleCurrentSong, useIsPlaying, useAuthentication, useRoomState };

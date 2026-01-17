@@ -1,8 +1,3 @@
-export interface SocketConnection{
-    success:string;
-    message:string;
-    data:object;
-}
 
 
 export interface CreateRoom{
@@ -37,26 +32,32 @@ export interface UserAuthPayload{
 export interface CreatedRoomResponse{
     success:boolean,
     message:string,
-    data:RoomType
+    data:RoomDetails
 }
 
-export interface RoomType {
+export interface RoomDetails {
     roomId: number;
     email: string;
     userId: number;
-    username:string;
+    username: string;
     roomName?: string;
     userLimit: number;
-    roomType:string;
-    users:[{
+    roomType: string;
+    users: {
         userId: number;
         email: string;
         isVerified: boolean;
-    }]|null;
+    }[] ;
 }
+
+export type WebSocketMessageType = "connect" | "create" | "join" | "close" | "message";
+
 
 export interface WebSocketMessageResponse{
     message:string;
     success:boolean;
-    data:object;
+    data:{
+        type:WebSocketMessageType;
+        data:object|null;
+    };
 }

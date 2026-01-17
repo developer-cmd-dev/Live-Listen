@@ -62,16 +62,15 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         usersMap.set(userData.userId,userData);
         const getRoom = roomsMap.get(userPayload.roomId);
         if(!getRoom){
-            socket.send(JSON.stringify(new Response(true, "Websocket connected",null)));
+            socket.send(JSON.stringify(new Response(true, "Websocket connected",{type:'connect',data:null})));
         }else{
-            socket.send(JSON.stringify(new Response(true, "Websocket connected",{...getRoom?.toJson()})))
+            socket.send(JSON.stringify(new Response(true, "Websocket connected",{type:'connect',data:{...getRoom?.toJson()}})))
         }
         console.log("Connected with ", userPayload.email)
 
     }
 
     const handleCreate = (data: any) => {
-        // if(!userData) socket.send(JSON.stringify(new Response(false, "Something went wrong", null)));
 
         const { roomName,  userLimit,username,userId } = data as RoomCreatePayload;
         const userData = usersMap.get(userId);
@@ -84,7 +83,7 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
             const room = new Room(roomId, userData.email, username,userData.userId, roomName,userLimit);
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
-            socket.send(JSON.stringify(new Response(true, "Room created", {...room.toJson(),roomType:'create'})))
+            socket.send(JSON.stringify(new Response(true, "Room created", {type:'create',data:{...room.toJson(),roomType:'create'}})))
             console.log(`Room created by ${userData.email} with ${roomId}`)
 
         } else {
@@ -104,13 +103,28 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
             return;
         }
         const getRoom = roomsMap.get(joinPayload.roomCode);
-        console.log(roomsMap);
         if (!getRoom) {
             socket.send(JSON.stringify(new Response(false, "Room has expired", null)));
             return;
         }
         getRoom?.setUser(userData, userData.userId);
-        socket.send(JSON.stringify(new Response(true, "Joined Room", {...getRoom?.toJson(),roomType:'join'})));
+        const responsePayload = {
+            ...getRoom?.toJson(),
+            roomType: 'join'
+        };
+        const response = new Response(true, "Joined Room", {type:"join",data:responsePayload});
+        socket.send(JSON.stringify(response))
+
+        getRoom.getUsers().forEach((value,key)=>{
+            if(socket!=value.getSocket()){
+                const response = new Response(true,"Joined Room",{type:'join',data:{user:userData}})
+                value.getSocket().send(JSON.stringify(response));
+            }
+        });
+
+
+
+
         console.log(userData.email+ " has joined in the room - "+joinPayload.roomCode)
     }
 
