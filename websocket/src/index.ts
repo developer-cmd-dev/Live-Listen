@@ -11,27 +11,30 @@ import JWT from './JWT.js';
 import { randomUUID } from 'crypto';
 import type{ CloseConnectionType, RoomCreatePayload } from './types/types.js';
 config();
+
+
+
+
+
 let roomsMap = new Map<number, Room>();
+let usersMap = new Map<number,User>();
 
 
+type WebSocketMessageType = "connect" | "create" | "join" | "message";
 
-type Type = "connect" | "create" | "join" | "message"
-
-export interface ConnectWebSocketQuery {
-    type: Type;
+export interface WebSocketConnectQuery {
+    type: WebSocketMessageType;
     data: object;
 }
 
-interface UserPayload {
+interface WebSocketUserPayload {
     email: string;
     userId: number;
     accessToken: string;
-    roomId:number;
+    roomId: number;
 }
 
-
-
-interface Message {
+interface WebSocketMessagePayload {
     roomId: number;
     message: string;
 }
@@ -47,15 +50,16 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
 
 
 
-    let userData: User;
+
 
 
     const handleConnect = (data: any) => {
-        const userPayload = data as UserPayload;
+        const userPayload = data as WebSocketUserPayload;
         const verifyToken = JWT.verifyToken(userPayload.accessToken);
         if (!verifyToken) socket.send(JSON.stringify(new Response(false, "Invalid Credential", null)))
-        userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true);
+       let userData:User = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true);
         userData.setUserSocket(socket);
+        usersMap.set(userData.userId,userData);
         const getRoom = roomsMap.get(userPayload.roomId);
         if(!getRoom){
             socket.send(JSON.stringify(new Response(true, "Websocket connected",null)));
@@ -67,10 +71,17 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
     }
 
     const handleCreate = (data: any) => {
-        const { roomName,  userLimit,usename } = data as RoomCreatePayload;
+        // if(!userData) socket.send(JSON.stringify(new Response(false, "Something went wrong", null)));
+
+        const { roomName,  userLimit,username,userId } = data as RoomCreatePayload;
+        const userData = usersMap.get(userId);
+        if(!userData) {
+            socket.send(JSON.stringify(new Response(false, "Something went wrong", null)));
+            return;
+        };
         const roomId = Math.floor(Math.random() * 10000);
         if (!roomsMap.has(roomId)) {
-            const room = new Room(roomId, userData.email, usename,userData.userId, roomName,userLimit);
+            const room = new Room(roomId, userData.email, username,userData.userId, roomName,userLimit);
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
             socket.send(JSON.stringify(new Response(true, "Room created", {...room.toJson(),roomType:'create'})))
@@ -82,35 +93,48 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
     }
 
     const handleJoin = (data: any) => {
-        const joinPayload = data as { roomId: number };
-        if (!joinPayload) socket.send(JSON.stringify(new Response(false, "invalid room id", null)));
-        const getRoom = roomsMap.get(joinPayload.roomId);
-        if (!getRoom) socket.send(JSON.stringify(new Response(false, "Room has expired", null)));
+        const joinPayload = data as { roomCode: number,userId:number };
+        if (!joinPayload){
+            socket.send(JSON.stringify(new Response(false, "invalid room id", null)));
+            return;
+        }
+        const userData = usersMap.get(joinPayload.userId);
+        if (!userData){
+            socket.send(JSON.stringify(new Response(false, "Something went wrong", null)));
+            return;
+        }
+        const getRoom = roomsMap.get(joinPayload.roomCode);
+        console.log(roomsMap);
+        if (!getRoom) {
+            socket.send(JSON.stringify(new Response(false, "Room has expired", null)));
+            return;
+        }
         getRoom?.setUser(userData, userData.userId);
         socket.send(JSON.stringify(new Response(true, "Joined Room", {...getRoom?.toJson(),roomType:'join'})));
-        console.log(userData.email+ " has joined in the room - "+joinPayload.roomId)
+        console.log(userData.email+ " has joined in the room - "+joinPayload.roomCode)
     }
 
-    const handleMessage = (data: any) => {
-        const payload = data as Message;
+    // const handleMessage = (data: any) => {
+    //     const payload = data as WebSocketMessagePayload;
 
-        const getRoom = roomsMap.get(payload.roomId);
+    //     const getRoom = roomsMap.get(payload.roomId);
 
-        const getSocketMap = getRoom?.getUsers();
-        getSocketMap?.forEach((value: User, key: number) => {
-            if (value.getSocket() != socket) {
-                socket.send(JSON.stringify(payload.message));
-            }
-        })
+    //     const getSocketMap = getRoom?.getUsers();
+    //     getSocketMap?.forEach((value: User, key: number) => {
+    //         if (value.getSocket() != socket) {
+    //             socket.send(JSON.stringify(payload.message));
+    //         }
+    //     })
 
 
-    }
+    // }
 
 
     const handleClose = (data:any)=>{
         const {roomId,userId,roomType} = data as CloseConnectionType;
         if(roomType=="create"){
             roomsMap.delete(roomId);
+            console.log(`Room deleted ${roomId}`)
         }else if(roomType=="join"){
           const getRoom=  roomsMap.get(roomId);
             getRoom?.destroyUser(userId);
@@ -124,7 +148,7 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
         connect: handleConnect,
         create: handleCreate,
         join: handleJoin,
-        message: handleMessage,
+        // message: handleMessage,
         close:handleClose
     }
 
@@ -132,16 +156,18 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
 
     socket.on('message', (data) => {
         try {
-            const payload = JSON.parse(data.toString()) as ConnectWebSocketQuery;
+            const payload = JSON.parse(data.toString()) as WebSocketConnectQuery;
+            //@ts-ignore
             handlers[payload.type]?.(payload.data);
         } catch (error) {
             console.log(error)
         }
     })
 
-    socket.on('close',(data)=>{
-        console.log('socket disconnected')
-    })
+    // socket.on('close',(data)=>{
+    //     console.log(userData)
+    //     console.log('socket disconnected for ')
+    // })
 
 })
 

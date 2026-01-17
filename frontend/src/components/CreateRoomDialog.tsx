@@ -24,7 +24,6 @@ function CreateRoomDialog({handleCreate}:Props) {
 
     const handleOnChange = (e:React.ChangeEvent<HTMLInputElement>)=>{
         const {name,value}=e.target;
-        console.log(name,value)
         setData((prev)=>({...prev,[name]:value}))
     }
 

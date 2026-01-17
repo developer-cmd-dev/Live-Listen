@@ -6,24 +6,15 @@ import SongsRow from "@/components/SongsRow"
 import PlayBackBar from "@/components/playBackBar"
 import { toast } from "sonner"
 import { useAuthentication, useHandleCurrentSong, useIsPlaying, useRoomState, useSongState } from "@/store/zustand"
-import Navbar from "@/components/Navbar"
-import { RoomAccess, type RoomAccessOptions } from "@/components/RoomAccess"
-import Chat from "@/components/Chat"
-import { motion } from 'motion/react'
-import { w3cwebsocket } from 'websocket'
-import type { CreatedRoomResponse, CreateRoomData, RoomType, SocketConnection } from "@/types/types"
-import { FastForward, Ghost, Music3, User, User2, Users } from "lucide-react"
-import { CanvasRevealEffect } from "@/components/ui/canvas-reveal-effect"
-import { Button } from "@/components/ui/button"
+
+import type { CreatedRoomResponse, CreateRoomData, JoinRoomData, RoomType, SocketConnection, WebSocketMessageResponse } from "@/types/types"
+
 import VinylIcon from "@/components/ui/vinyl-icon"
-import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
-import { Input } from "@/components/ui/input"
-import { Label } from "@radix-ui/react-label"
-import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@radix-ui/react-dialog"
-import { DialogHeader } from "@/components/ui/dialog"
+
 import CreateRoom from "@/components/CreateRoom"
 import { useSocket } from "@/hooks/useSocket"
 import CreateRoomDialog from "@/components/CreateRoomDialog"
+import JoinRoomDialog from "@/components/JoinRoomDialog"
 
 export default function Dashboard() {
     const webSocketUrl = import.meta.env.VITE_WEBSOCKET_URL as string;
@@ -32,8 +23,8 @@ export default function Dashboard() {
 
     const { userData } = useAuthentication((state) => state)
     const [roomId, setRoomId] = useState<number | null>(null)
-    const socket = useSocket(webSocketUrl);
-    const { setRoomData,roomData } = useRoomState((state) => state);
+    const {socket,connected} = useSocket(webSocketUrl);
+    const { setRoomData, roomData } = useRoomState((state) => state);
 
 
 
@@ -53,38 +44,41 @@ export default function Dashboard() {
     }, [])
 
     useEffect(() => {
+        if(!connected || !socket) return;
+        console.log(socket)
+        const accessToken = localStorage.getItem('access-token');
+        const getLastCreatedRoomId = localStorage.getItem("last-created-roomid");
+        const data = {
+            type: "connect",
+            data: {
+                email: userData?.email,
+                userId: userData?.id,
+                accessToken: accessToken,
+                roomId: Number(getLastCreatedRoomId)
+            }
+        }
 
-            if(!socket|| userData==null||socket.readyState !== WebSocket.OPEN) return;
-      
-            const accessToken = localStorage.getItem('access-token');
-            const getLastCreatedRoomId=localStorage.getItem("last-created-roomid");
-                const data = {
-                    type: "connect",
-                    data: {
-                        email: userData?.email,
-                        userId: userData?.id,
-                        accessToken: accessToken,
-                        roomId:Number(getLastCreatedRoomId)
-                    }
-                }
+            socket.send(JSON.stringify(data));
 
-                socket.send(JSON.stringify(data));
-                socket.onmessage = (data: any) => {
-                    const success = JSON.parse(data.data as string) as SocketConnection;
-                    const roomData:RoomType|null= success.data as RoomType;
-                    if(!roomData){
-                        setIsRoomCreated(false);
-                    }else{
-                    setRoomData(roomData);
-                    setIsRoomCreated(true)
-                    }
-                    
-                    if (!success.success) toast.error(success.message);
-                }
+        
 
-             
+        socket.onmessage = (data: any) => {
+            const success = JSON.parse(data.data as string) as SocketConnection;
+            const roomData: RoomType | null = success.data as RoomType;
+            if (!roomData) {
+                setIsRoomCreated(false);
+            } else {
+                setRoomData(roomData);
+                setIsRoomCreated(true)
+            }
 
-    }, [socket])
+            if (!success.success) toast.error(success.message);
+        }
+
+        
+
+
+    }, [connected])
 
 
 
@@ -135,17 +129,23 @@ export default function Dashboard() {
     }
 
 
-    const handleRoomCreate = () => setIsRoomCreated((prev) => !prev);
 
 
 
-    const createRoom = async (data:CreateRoomData) => {
-        console.log(data)
+    const createRoom = async (data: CreateRoomData) => {
         try {
+            if(!socket || !connected || !userData) {
+                toast.error("Something went wrong!");
+                return;
+            };
+            data={
+                ...data,
+                userId:userData?.id,
+            }
             socket.send(JSON.stringify({ type: 'create', data: data }));
             socket.onmessage = (data) => {
-                const response = JSON.parse(data.data.toString()) ;
-                localStorage.setItem("last-created-roomid",response.data.roomId);
+                const response = JSON.parse(data.data.toString());
+                localStorage.setItem("last-created-roomid", response.data.roomId);
                 setRoomData(response.data);
                 setIsRoomCreated(true)
             }
@@ -155,15 +155,35 @@ export default function Dashboard() {
 
     }
 
+    const joinRoom = async(data:any)=>{
+        const joinPayload = data as JoinRoomData;
+        console.log(joinPayload)
+        if(!socket) return;
+        socket.send(JSON.stringify({type:'join',data:joinPayload}));
 
-    const exitRoom = ()=>{
+        socket.onmessage = (data)=>{
+            const messagePayload = JSON.parse(data.data.toString()) as WebSocketMessageResponse;
+            if(messagePayload.success){
+               setRoomData(messagePayload.data as RoomType)
+               setIsRoomCreated(true);
+            }
+        }
+    }
+
+
+    const exitRoom = () => {
         setIsRoomCreated(false);
-        console.log(roomData)
-       socket.send(JSON.stringify({ type: 'close', data: { roomId: roomData?.roomId, userId: userData?.id, roomType:roomData?.roomType} }));
+        const closeData = {
+            roomId: roomData?.roomId,
+            userId: userData?.id,
+            roomType: roomData?.roomType,
+        };
+        if(!socket) return;
+        socket.send(JSON.stringify({ type: 'close', data: closeData }));
 
-       socket.onmessage=(data)=>{
-        console.log(data.data)
-       }
+        socket.onmessage = (data) => {
+            console.log(data.data)
+        }
     }
 
 
@@ -233,7 +253,7 @@ export default function Dashboard() {
                                 <h1 >Listen Together</h1>
                             </div>
 
-                            {!isRoomCreated  ? (<div className="col-span-1  lg:col-span-2 row-span-1  flex justify-center items-center h-145">
+                            {!isRoomCreated ? (<div className="col-span-1  lg:col-span-2 row-span-1  flex justify-center items-center h-145">
                                 <div className="flex flex-col px-5 items-center justify-center w-full gap-7  ">
                                     <div className="w-full flex-col gap-1 flex items-center justify-center">
 
@@ -246,10 +266,9 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className=" w-full flex items-center justify-center gap-3">
-                                      <CreateRoomDialog handleCreate={createRoom}/>
-                                        <Button variant={"outline"}>
-                                            Join Room
-                                        </Button>
+                                        <CreateRoomDialog handleCreate={createRoom} />
+
+                                        <JoinRoomDialog handleJoin={joinRoom}/>
                                     </div>
 
                                 </div>

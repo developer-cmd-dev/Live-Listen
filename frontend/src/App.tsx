@@ -41,6 +41,7 @@ function App() {
                 if (axios.isAxiosError(error)) {
                   if (error.response?.status === 401) {
                     toast.error("Your Session has expired. Login Again")
+                    navigate('/login')
                   }
                 }
               })

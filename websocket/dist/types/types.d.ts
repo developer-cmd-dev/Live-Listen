@@ -6,6 +6,7 @@ export interface CloseConnectionType {
 export interface RoomCreatePayload {
     roomName?: string;
     userLimit: number;
-    usename: string;
+    username: string;
+    userId: number;
 }
 //# sourceMappingURL=types.d.ts.map

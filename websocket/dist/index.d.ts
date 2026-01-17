@@ -1,6 +1,6 @@
-type Type = "connect" | "create" | "join" | "message";
-export interface ConnectWebSocketQuery {
-    type: Type;
+type WebSocketMessageType = "connect" | "create" | "join" | "message";
+export interface WebSocketConnectQuery {
+    type: WebSocketMessageType;
     data: object;
 }
 export {};

@@ -1,4 +1,3 @@
-import type { ConnectWebSocketQuery } from '../index.js';
 export interface CloseConnectionType  {
 
         userId: number;
@@ -10,5 +9,9 @@ export interface CloseConnectionType  {
 export interface RoomCreatePayload {
         roomName?: string;
         userLimit: number;
-        usename:string;
+        username:string;
+        userId:number;
     }
+
+
+  

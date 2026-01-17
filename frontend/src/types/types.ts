@@ -13,9 +13,15 @@ export interface CreateRoom{
 
 
 export interface CreateRoomData{
+    userId:number;
     roomName?: string;
     username:string;
     userLimit: number;
+}
+
+export interface JoinRoomData{
+    roomCode:number;
+    userId:number;
 }
 
 
@@ -47,4 +53,10 @@ export interface RoomType {
         email: string;
         isVerified: boolean;
     }]|null;
+}
+
+export interface WebSocketMessageResponse{
+    message:string;
+    success:boolean;
+    data:object;
 }

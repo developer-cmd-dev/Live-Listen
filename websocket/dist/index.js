@@ -10,18 +10,19 @@ import JWT from './JWT.js';
 import { randomUUID } from 'crypto';
 config();
 let roomsMap = new Map();
+let usersMap = new Map();
 const port = 3002;
 const wss = new WebSocketServer({ port: port });
 console.log("Websocket is running on " + port);
 wss.on('connection', (socket, req) => {
-    let userData;
     const handleConnect = (data) => {
         const userPayload = data;
         const verifyToken = JWT.verifyToken(userPayload.accessToken);
         if (!verifyToken)
             socket.send(JSON.stringify(new Response(false, "Invalid Credential", null)));
-        userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true);
+        let userData = new User(userPayload.userId, userPayload.email, userPayload.accessToken, true);
         userData.setUserSocket(socket);
+        usersMap.set(userData.userId, userData);
         const getRoom = roomsMap.get(userPayload.roomId);
         if (!getRoom) {
             socket.send(JSON.stringify(new Response(true, "Websocket connected", null)));
@@ -32,10 +33,17 @@ wss.on('connection', (socket, req) => {
         console.log("Connected with ", userPayload.email);
     };
     const handleCreate = (data) => {
-        const { roomName, userLimit, usename } = data;
+        // if(!userData) socket.send(JSON.stringify(new Response(false, "Something went wrong", null)));
+        const { roomName, userLimit, username, userId } = data;
+        const userData = usersMap.get(userId);
+        if (!userData) {
+            socket.send(JSON.stringify(new Response(false, "Something went wrong", null)));
+            return;
+        }
+        ;
         const roomId = Math.floor(Math.random() * 10000);
         if (!roomsMap.has(roomId)) {
-            const room = new Room(roomId, userData.email, usename, userData.userId, roomName, userLimit);
+            const room = new Room(roomId, userData.email, username, userData.userId, roomName, userLimit);
             room.setUser(userData, userData.userId);
             roomsMap.set(roomId, room);
             socket.send(JSON.stringify(new Response(true, "Room created", { ...room.toJson(), roomType: 'create' })));
@@ -47,29 +55,40 @@ wss.on('connection', (socket, req) => {
     };
     const handleJoin = (data) => {
         const joinPayload = data;
-        if (!joinPayload)
+        if (!joinPayload) {
             socket.send(JSON.stringify(new Response(false, "invalid room id", null)));
-        const getRoom = roomsMap.get(joinPayload.roomId);
-        if (!getRoom)
+            return;
+        }
+        const userData = usersMap.get(joinPayload.userId);
+        if (!userData) {
+            socket.send(JSON.stringify(new Response(false, "Something went wrong", null)));
+            return;
+        }
+        const getRoom = roomsMap.get(joinPayload.roomCode);
+        console.log(roomsMap);
+        if (!getRoom) {
             socket.send(JSON.stringify(new Response(false, "Room has expired", null)));
+            return;
+        }
         getRoom?.setUser(userData, userData.userId);
         socket.send(JSON.stringify(new Response(true, "Joined Room", { ...getRoom?.toJson(), roomType: 'join' })));
-        console.log(userData.email + " has joined in the room - " + joinPayload.roomId);
+        console.log(userData.email + " has joined in the room - " + joinPayload.roomCode);
     };
-    const handleMessage = (data) => {
-        const payload = data;
-        const getRoom = roomsMap.get(payload.roomId);
-        const getSocketMap = getRoom?.getUsers();
-        getSocketMap?.forEach((value, key) => {
-            if (value.getSocket() != socket) {
-                socket.send(JSON.stringify(payload.message));
-            }
-        });
-    };
+    // const handleMessage = (data: any) => {
+    //     const payload = data as WebSocketMessagePayload;
+    //     const getRoom = roomsMap.get(payload.roomId);
+    //     const getSocketMap = getRoom?.getUsers();
+    //     getSocketMap?.forEach((value: User, key: number) => {
+    //         if (value.getSocket() != socket) {
+    //             socket.send(JSON.stringify(payload.message));
+    //         }
+    //     })
+    // }
     const handleClose = (data) => {
         const { roomId, userId, roomType } = data;
         if (roomType == "create") {
             roomsMap.delete(roomId);
+            console.log(`Room deleted ${roomId}`);
         }
         else if (roomType == "join") {
             const getRoom = roomsMap.get(roomId);
@@ -81,20 +100,22 @@ wss.on('connection', (socket, req) => {
         connect: handleConnect,
         create: handleCreate,
         join: handleJoin,
-        message: handleMessage,
+        // message: handleMessage,
         close: handleClose
     };
     socket.on('message', (data) => {
         try {
             const payload = JSON.parse(data.toString());
+            //@ts-ignore
             handlers[payload.type]?.(payload.data);
         }
         catch (error) {
             console.log(error);
         }
     });
-    socket.on('close', (data) => {
-        console.log('socket disconnected');
-    });
+    // socket.on('close',(data)=>{
+    //     console.log(userData)
+    //     console.log('socket disconnected for ')
+    // })
 });
 //# sourceMappingURL=index.js.map
