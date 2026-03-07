@@ -1,9 +1,7 @@
-export interface CloseConnectionType  {
-
+export interface WebSocketCloseConnectionType  {
         userId: number;
         roomType: "join" | "create";
         roomId: number;
-    
 }
 
 export interface RoomCreatePayload {

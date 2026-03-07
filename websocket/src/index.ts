@@ -9,7 +9,7 @@ import { json } from 'stream/consumers';
 import { config } from 'dotenv';
 import JWT from './JWT.js';
 import { randomUUID } from 'crypto';
-import type{ CloseConnectionType, RoomCreatePayload } from './types/types.js';
+import type{  RoomCreatePayload, WebSocketCloseConnectionType } from './types/types.js';
 config();
 
 
@@ -121,10 +121,6 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
                 value.getSocket().send(JSON.stringify(response));
             }
         });
-
-
-
-
         console.log(userData.email+ " has joined in the room - "+joinPayload.roomCode)
     }
 
@@ -145,10 +141,11 @@ wss.on('connection', (socket: WebSocket, req: IncomingMessage) => {
 
 
     const handleClose = (data:any)=>{
-        const {roomId,userId,roomType} = data as CloseConnectionType;
+        const {roomId,userId,roomType} = data as WebSocketCloseConnectionType;
         if(roomType=="create"){
             roomsMap.delete(roomId);
             console.log(`Room deleted ${roomId}`)
+            
         }else if(roomType=="join"){
           const getRoom=  roomsMap.get(roomId);
             getRoom?.destroyUser(userId);
