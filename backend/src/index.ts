@@ -28,11 +28,13 @@ app.use(passport.initialize())
 
 client.$connect().then(() => {
     console.log("Db is connected")
-    redisClient.connect().then(() => {
-        console.log("Redis is connected")
-        app.listen(port, () => console.log("server is running on " + port));
+    // redisClient.connect().then(() => {
+    //     console.log("Redis is connected")
+        
 
-    })
+    // })
+
+    app.listen(port, () => console.log("server is running on " + port));
 }).catch((error:Error)=>console.log(error.message))
 
 app.use(route)
